@@ -1,0 +1,36 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>).",
+    "Change Contract .contracts/say-hi.json approved by reviewer in Approval Commit {{short:2}}."
+  ],
+  "failures": [],
+  "deviations": [
+    {
+      "id": "{{id:unplanned-change:interface:src/greet.ts#greet}}",
+      "fingerprint": "{{fingerprint:unplanned-change:interface:src/greet.ts#greet}}",
+      "kind": "unplanned-change",
+      "check": "interface",
+      "target": "src/greet.ts#greet",
+      "detail": "The signature of src/greet.ts#greet changes from greet(name:string):string to greet(name:string,excited:boolean):string, but no interface Clause declares it.",
+      "status": "unsigned"
+    },
+    {
+      "id": "{{id:unmet-clause:interface:src/greet.ts#greet}}",
+      "fingerprint": "{{fingerprint:unmet-clause:interface:src/greet.ts#greet}}",
+      "kind": "unmet-clause",
+      "check": "interface",
+      "target": "src/greet.ts#greet",
+      "detail": "The Change Contract declares src/greet.ts#greet with the signature greet(name:string,punctuation=\"!\"):string, but the change gives it greet(name:string,excited:boolean):string.",
+      "status": "unsigned"
+    }
+  ],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
+}

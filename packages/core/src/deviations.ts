@@ -10,18 +10,17 @@ import {
   type DependencyChange,
 } from './dependencies.js';
 import { matchesGlob } from './glob.js';
-import type { Deviation, DeviationCheck, DeviationKind, FileChange, GateInput } from './types.js';
+import type { Finding } from './finding.js';
+import {
+  interfaceFindings,
+  isSourceFile,
+  nonSourceFindings,
+  symbolFindings,
+  type InterfaceChange,
+} from './symbol-deviations.js';
+import type { Deviation, FileChange, GateInput } from './types.js';
 import type { ChangeContract } from './validate-contract.js';
 
-/** The facts that identify one Deviation, before an ID or Sign-off status is attached. */
-interface Finding {
-  kind: DeviationKind;
-  check: DeviationCheck;
-  target: string;
-  detail: string;
-  /** What the Deviation consists of; any change to it gives a new Deviation Fingerprint. */
-  content: string;
-}
 
 /** Step 4 of the gate: compare the change (head vs its merge-base) with the Change Contract. */
 export async function detectDeviations(
@@ -35,6 +34,7 @@ export async function detectDeviations(
   const fileFindings: Finding[] = [];
   const dependencyChanges: DependencyChange[] = [];
   const lockfileFindings: Finding[] = [];
+  const interfaceChanges: InterfaceChange[] = [];
 
   for (const change of changes) {
     const before = await input.git.readFile(mergeBase, change.path);
@@ -63,7 +63,20 @@ export async function detectDeviations(
     }
     const outOfScope = scopeFinding(change, contract, config);
     if (outOfScope) fileFindings.push({ ...outOfScope, content });
+    if (!isSourceFile(change.path)) {
+      fileFindings.push(...nonSourceFindings(change, contract, !outOfScope, content));
+      continue;
+    }
+    const symbols = symbolFindings(change, before, after, contract, !outOfScope);
+    fileFindings.push(...symbols.findings);
+    // A test module's exports aren't public interface. An out-of-scope file is already one
+    // whole-file Deviation: its interface changes count towards meeting interface Clauses,
+    // but aren't reported a second time.
+    if (!config.testFiles.some((glob) => matchesGlob(change.path, glob))) {
+      interfaceChanges.push(...symbols.interfaceChanges.map((c) => ({ ...c, coveredByFile: Boolean(outOfScope) })));
+    }
   }
+  const interfaceResult = interfaceFindings(contract.interface ?? [], interfaceChanges);
 
   const clauses = contract.dependencies ?? [];
   const dependencyFindings: Finding[] = dependencyChanges
@@ -88,9 +101,14 @@ export async function detectDeviations(
       content: JSON.stringify(clause),
     }));
 
-  return [...fileFindings, ...dependencyFindings, ...(lockfilesExplained ? [] : lockfileFindings), ...unmetFindings].map(
-    toDeviation,
-  );
+  return [
+    ...fileFindings,
+    ...interfaceResult.unplanned,
+    ...dependencyFindings,
+    ...(lockfilesExplained ? [] : lockfileFindings),
+    ...interfaceResult.unmet,
+    ...unmetFindings,
+  ].map(toDeviation);
 }
 
 function mustNotChangeFinding(change: FileChange, contract: ChangeContract): Omit<Finding, 'content'> | undefined {
@@ -128,8 +146,8 @@ function scopeFinding(
 }
 
 /**
- * A path glob, or `path#*` for every symbol in a file, covers whole files. A single symbol
- * (`path#Name`) needs symbol-level detection, which arrives with milestone 4.
+ * A path glob, or `path#*` for every symbol in a file, covers whole files. Single-symbol
+ * entries (`path#Name`) are checked symbol by symbol, in symbol-deviations.ts.
  */
 function mustNotChangeCovers(entry: string, path: string): boolean {
   const [glob, symbol] = entry.split('#');

@@ -29,6 +29,8 @@ export interface GateConfig {
   signoffPolicy?: SignoffPolicyConfig;
   /** Globs for CI and config files; changing one outside the scope is a ci-config Deviation. */
   ciConfigFiles?: string[];
+  /** Globs for test files. Symbol-level checks skip them; test Clauses cover them (milestone 5). */
+  testFiles?: string[];
   /** The gate bot's git identity. Read by the CLI and host adapters to fill `GateInput.bot`. */
   bot?: BotIdentity;
 }
@@ -37,6 +39,7 @@ export interface ResolvedConfig {
   agentDetection: Required<AgentDetectionConfig>;
   signoffPolicy: Required<SignoffPolicyConfig>;
   ciConfigFiles: string[];
+  testFiles: string[];
 }
 
 /** Where a repo keeps its gate config. The gate reads it from the base branch, never from the PR. */
@@ -69,6 +72,7 @@ const DEFAULTS: ResolvedConfig = {
     '.npmrc',
     GATE_CONFIG_FILE,
   ],
+  testFiles: ['**/*.test.*', '**/*.spec.*', '**/__tests__/**'],
 };
 
 /** Fills every setting the team's config leaves out with its default. Lists replace, not merge. */
@@ -77,5 +81,6 @@ export function resolveConfig(config: GateConfig): ResolvedConfig {
     agentDetection: { ...DEFAULTS.agentDetection, ...config.agentDetection },
     signoffPolicy: { ...DEFAULTS.signoffPolicy, ...config.signoffPolicy },
     ciConfigFiles: config.ciConfigFiles ?? DEFAULTS.ciConfigFiles,
+    testFiles: config.testFiles ?? DEFAULTS.testFiles,
   };
 }

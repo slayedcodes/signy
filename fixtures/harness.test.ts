@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, describe, it } from 'vitest';
+import { describe, it, onTestFinished } from 'vitest';
 import { runGate, type Deviation, type GateComment } from '@change-contract/core';
 import { createGitReader, readCommits } from '@change-contract/cli';
 import { buildFixtureRepo, loadFixture, resolveExpected, type Fixture, type FixtureRepo } from './build-fixture.js';
@@ -11,9 +11,6 @@ const fixtureNames = readdirSync(fixturesDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
   .sort();
-
-const builtRepos: string[] = [];
-afterAll(() => builtRepos.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
 
 const readText = (...segments: string[]) => readFileSync(join(fixturesDir, ...segments), 'utf8');
 
@@ -58,7 +55,8 @@ describe('gate fixtures', () => {
   it.for(fixtureNames)('%s', async (name, { expect }) => {
     const fixture = loadFixture(readText(name, 'fixture.json'));
     const repo = await buildFixtureRepo(fixture);
-    builtRepos.push(repo.dir);
+    // Each fixture removes its own repo; one sweep at the end outlasts vitest's hook timeout on Windows.
+    onTestFinished(() => rmSync(repo.dir, { recursive: true, force: true }));
     const comments = JSON.parse(
       await resolveDeviations(JSON.stringify(fixture.comments), fixture, repo),
     ) as GateComment[];

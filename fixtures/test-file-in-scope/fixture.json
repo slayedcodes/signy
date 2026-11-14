@@ -1,0 +1,54 @@
+{
+  "description": "An in-scope test file with no listed symbols is in scope as a whole; its exports are not public interface.",
+  "pr": {
+    "author": "agent-operator"
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Agent Operator",
+        "email": "operator@example.com"
+      },
+      "message": "Add Change Contract: say-hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        ".contracts/say-hi.json": "{\n  \"version\": 1,\n  \"slug\": \"say-hi\",\n  \"summary\": \"Greet with hi.\",\n  \"scope\": {\n    \"files\": [\n      \"src/greet.ts\",\n      \"src/greet.test.ts\"\n    ],\n    \"symbols\": [\n      \"src/greet.ts#greet\"\n    ]\n  }\n}\n"
+      }
+    },
+    {
+      "author": {
+        "name": "change-contract[bot]",
+        "email": "change-contract-bot@users.noreply.example.com"
+      },
+      "message": "Approve Change Contract say-hi\n\nContract-Hash: {{contractHash}}\nApproved-By: reviewer\nApproval-Comment: https://code.example/pr/1#comment-1",
+      "files": {}
+    },
+    {
+      "author": {
+        "name": "Agent Operator",
+        "email": "operator@example.com"
+      },
+      "message": "Say hi instead of hello\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n",
+        "src/greet.test.ts": "import { greet } from './greet';\nexport function helper(): string {\n  return 'b';\n}\nit('greets', () => expect(greet('a')).toBe('Hi, a'));\nexport const extra = 1;\n"
+      }
+    }
+  ],
+  "comments": [
+    {
+      "author": "reviewer",
+      "permission": "write",
+      "isBot": false,
+      "createdAt": "2023-11-14T22:15:00Z",
+      "url": "https://code.example/pr/1#comment-1",
+      "body": "Looks right.\n/contract approve"
+    }
+  ],
+  "base": {
+    "files": {
+      "package.json": "{ \"name\": \"pilot\", \"version\": \"1.0.0\" }\n",
+      "src/greet.ts": "export function greet(name: string): string {\n  return `Hello, ${name}`;\n}\n",
+      "src/greet.test.ts": "import { greet } from './greet';\nexport function helper(): string {\n  return 'a';\n}\nit('greets', () => expect(greet('a')).toBe('Hello, a'));\n"
+    }
+  }
+}

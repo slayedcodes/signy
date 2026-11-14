@@ -1,0 +1,27 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>).",
+    "Change Contract .contracts/say-hi.json approved by reviewer in Approval Commit {{short:2}}."
+  ],
+  "failures": [],
+  "deviations": [
+    {
+      "id": "{{id:unplanned-change:must-not-change:src/greet.ts#greet}}",
+      "fingerprint": "{{fingerprint:unplanned-change:must-not-change:src/greet.ts#greet}}",
+      "kind": "unplanned-change",
+      "check": "must-not-change",
+      "target": "src/greet.ts#greet",
+      "detail": "src/greet.ts#greet is modified, but the Change Contract says src/greet.ts#greet must not change.",
+      "status": "unsigned"
+    }
+  ],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
+}
