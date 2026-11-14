@@ -1,0 +1,21 @@
+{
+  "description": "An agent co-authored the PR, but the override label exempts it from the gate.",
+  "pr": {
+    "author": "human-dev",
+    "labels": [
+      "contract:exempt"
+    ]
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Human Dev",
+        "email": "human-dev@example.com"
+      },
+      "message": "Say hi instead of hello\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ]
+}

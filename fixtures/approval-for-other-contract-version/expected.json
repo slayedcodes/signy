@@ -1,0 +1,18 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>)."
+  ],
+  "failures": [
+    {
+      "rule": "approval-hash-mismatch",
+      "message": "Commit {{short:2}} approves Contract-Hash sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, but the Change Contract's hash is {{contractHash}}. A different Contract Version needs a fresh Contract Approval.",
+      "commit": "{{sha:2}}"
+    },
+    {
+      "rule": "approval-missing",
+      "message": "No valid Approval Commit for Change Contract .contracts/say-hi.json ({{contractHash}}). A reviewer approves it by commenting `/contract approve` on the PR."
+    }
+  ]
+}

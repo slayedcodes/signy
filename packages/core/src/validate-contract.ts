@@ -17,8 +17,13 @@ export interface ContractValidationResult {
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const checkSchema = ajv.compile(schema);
 
+export interface ValidateOptions {
+  /** Where the contract lives, e.g. `.contracts/<slug>.json`; enables the slug-matches-file rule. */
+  file?: string;
+}
+
 /** Schema validation plus contract lint for one Change Contract. */
-export function validateContract(contract: unknown): ContractValidationResult {
+export function validateContract(contract: unknown, options: ValidateOptions = {}): ContractValidationResult {
   if (!checkSchema(contract)) {
     const errors = (checkSchema.errors ?? []).map((e) => ({
       rule: 'schema',
@@ -28,17 +33,26 @@ export function validateContract(contract: unknown): ContractValidationResult {
     return { ok: false, errors };
   }
   // Lint assumes the schema's shape, so it only runs on schema-valid contracts.
-  const errors = lintContract(contract as unknown as ChangeContractShape);
+  const errors = lintContract(contract as unknown as ChangeContractShape, options);
   return { ok: errors.length === 0, errors };
 }
 
 interface ChangeContractShape {
+  slug: string;
   scope: { files: string[]; symbols: string[] };
   interface?: Array<{ symbol: string }>;
 }
 
-function lintContract(contract: ChangeContractShape): ContractValidationError[] {
+function lintContract(contract: ChangeContractShape, options: ValidateOptions): ContractValidationError[] {
   const errors: ContractValidationError[] = [];
+  const expectedSlug = options.file?.split(/[\\/]/).at(-1)?.replace(/\.json$/, '');
+  if (expectedSlug !== undefined && contract.slug !== expectedSlug) {
+    errors.push({
+      rule: 'slug-matches-file',
+      path: '/slug',
+      message: `slug "${contract.slug}" must match the file name; expected "${expectedSlug}".`,
+    });
+  }
   if (contract.scope.files.length === 0) {
     errors.push({
       rule: 'scope-empty',

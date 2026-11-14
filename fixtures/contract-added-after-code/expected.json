@@ -1,0 +1,19 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>)."
+  ],
+  "failures": [
+    {
+      "rule": "contract-commit-empty",
+      "message": "The PR's first commit {{short:1}} must be the Contract Commit, but it adds no Change Contract.",
+      "commit": "{{sha:1}}"
+    },
+    {
+      "rule": "contract-changed-later",
+      "message": "Commit {{short:2}} adds .contracts/say-hi.json. After the Contract Commit no commit may add, delete or edit anything under .contracts/; a change of scope needs a new Contract Version and a fresh Contract Approval.",
+      "commit": "{{sha:2}}"
+    }
+  ]
+}

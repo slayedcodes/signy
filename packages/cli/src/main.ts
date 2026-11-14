@@ -50,7 +50,7 @@ function validateFile(file: string, io: Io): boolean {
     io.stderr(`${file}: not valid JSON (${(error as Error).message})\n`);
     return false;
   }
-  const result = validateContract(contract);
+  const result = validateContract(contract, { file });
   if (result.ok) {
     io.stdout(`${file}: valid Change Contract\n`);
     return true;

@@ -1,0 +1,13 @@
+{
+  "description": "An agent co-authored the only commit, and the PR has no Change Contract.",
+  "pr": { "author": "human-dev" },
+  "commits": [
+    {
+      "author": { "name": "Human Dev", "email": "human-dev@example.com" },
+      "message": "Say hi instead of hello\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ]
+}

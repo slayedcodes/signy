@@ -1,0 +1,18 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>)."
+  ],
+  "failures": [
+    {
+      "rule": "approval-not-bot",
+      "message": "Commit {{short:2}} looks like an Approval Commit but was authored by Agent Operator <operator@example.com>, not the gate bot change-contract[bot] <change-contract-bot@users.noreply.example.com>.",
+      "commit": "{{sha:2}}"
+    },
+    {
+      "rule": "approval-missing",
+      "message": "No valid Approval Commit for Change Contract .contracts/say-hi.json ({{contractHash}}). A reviewer approves it by commenting `/contract approve` on the PR."
+    }
+  ]
+}

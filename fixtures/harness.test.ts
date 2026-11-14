@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { runGate } from '@change-contract/core';
 import { createGitReader, readCommits } from '@change-contract/cli';
-import { buildFixtureRepo, type FixtureSpec } from './build-fixture.js';
+import { buildFixtureRepo, loadFixture, resolveExpected } from './build-fixture.js';
 
 const fixturesDir = fileURLToPath(new URL('.', import.meta.url));
 const fixtureNames = readdirSync(fixturesDir, { withFileTypes: true })
@@ -15,24 +15,22 @@ const fixtureNames = readdirSync(fixturesDir, { withFileTypes: true })
 const builtRepos: string[] = [];
 afterAll(() => builtRepos.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
 
-function readJson<T>(...segments: string[]): T {
-  return JSON.parse(readFileSync(join(fixturesDir, ...segments), 'utf8')) as T;
-}
+const readText = (...segments: string[]) => readFileSync(join(fixturesDir, ...segments), 'utf8');
 
 describe('gate fixtures', () => {
   it.each(fixtureNames)('%s', async (name) => {
-    const spec = readJson<FixtureSpec>(name, 'fixture.json');
-    const expected = readJson<unknown>(name, 'expected.json');
-    const repo = buildFixtureRepo(spec);
+    const fixture = loadFixture(readText(name, 'fixture.json'));
+    const repo = buildFixtureRepo(fixture);
     builtRepos.push(repo.dir);
+    const expected = resolveExpected(readText(name, 'expected.json'), repo, fixture);
 
     const result = await runGate({
-      pr: { author: spec.pr.author, base: repo.base, head: repo.head },
+      pr: { ...fixture.pr, base: repo.base, head: repo.head },
       commits: readCommits(repo.dir, repo.base, repo.head),
       git: createGitReader(repo.dir),
-      comments: spec.comments,
-      config: spec.config,
-      bot: spec.bot,
+      comments: fixture.comments,
+      config: fixture.config,
+      bot: fixture.bot,
     });
 
     expect(result).toEqual(expected);

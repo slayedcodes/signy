@@ -101,6 +101,22 @@ describe('validateContract', () => {
     });
   });
 
+  it('rejects a slug that does not match the file name, when the file is known', () => {
+    const contract = exampleContract();
+
+    expect(validateContract(contract, { file: '.contracts/add-retry-to-billing-client.json' }).ok).toBe(true);
+    expect(validateContract(contract, { file: '.contracts/retry.json' })).toEqual({
+      ok: false,
+      errors: [
+        {
+          rule: 'slug-matches-file',
+          path: '/slug',
+          message: 'slug "add-retry-to-billing-client" must match the file name; expected "retry".',
+        },
+      ],
+    });
+  });
+
   it('rejects two interface Clauses for the same symbol', () => {
     const contract = exampleContract();
     contract.interface.push({ symbol: 'src/billing/retry.ts#withRetry', change: 'modify' });

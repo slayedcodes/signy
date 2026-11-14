@@ -1,0 +1,13 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>)."
+  ],
+  "failures": [
+    {
+      "rule": "contract-missing",
+      "message": "This Agent-authored PR has no Change Contract. Run `contract init` to draft one, and make it the PR's first commit."
+    }
+  ]
+}

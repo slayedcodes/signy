@@ -8,8 +8,10 @@ export type {
   FileChangeStatus,
   GateComment,
   GateCommit,
-  GateConfig,
+  GateFailure,
   GateInput,
   GateResult,
   GitReader,
+  Permission,
 } from './gate.js';
+export type { AgentDetectionConfig, GateConfig } from './config.js';

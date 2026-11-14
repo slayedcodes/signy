@@ -1,0 +1,21 @@
+{
+  "description": "No agent markers, but the override label says a Change Contract is required.",
+  "pr": {
+    "author": "human-dev",
+    "labels": [
+      "contract:required"
+    ]
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Human Dev",
+        "email": "human-dev@example.com"
+      },
+      "message": "Say hi instead of hello",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ]
+}

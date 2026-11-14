@@ -26,9 +26,13 @@ export function createGitReader(dir: string): GitReader {
 const FIELD = '\x1f';
 const RECORD = '\x1e';
 
-/** The commits in `base..head`, oldest first, each with its author and changed files. */
+/**
+ * The commits in `base..head`, oldest first, each with its author and changed files.
+ * Ordered by the commit graph, not by commit dates, which anyone can set.
+ */
 export function readCommits(dir: string, base: string, head: string): GateCommit[] {
-  const log = git(dir, ['log', '--reverse', `--format=%H${FIELD}%an${FIELD}%ae${FIELD}%B${RECORD}`, `${base}..${head}`]);
+  const format = `--format=%H${FIELD}%an${FIELD}%ae${FIELD}%B${RECORD}`;
+  const log = git(dir, ['log', '--reverse', '--topo-order', format, `${base}..${head}`]);
   return log
     .split(RECORD)
     .map((record) => record.trim())
@@ -42,7 +46,7 @@ export function readCommits(dir: string, base: string, head: string): GateCommit
 const STATUS: Record<string, FileChangeStatus> = { A: 'added', M: 'modified', D: 'deleted' };
 
 function readFileChanges(dir: string, sha: string): FileChange[] {
-  // --no-renames reports a rename as delete + add, so a replaced contract file is always visible.
+  // --no-renames reports a rename as delete + add, so a replaced Change Contract is always visible.
   const out = git(dir, ['diff-tree', '--root', '--no-commit-id', '-r', '--no-renames', '--name-status', sha]);
   return out
     .split('\n')

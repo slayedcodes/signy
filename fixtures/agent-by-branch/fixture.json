@@ -1,0 +1,19 @@
+{
+  "description": "The PR branch follows an agent naming pattern.",
+  "pr": {
+    "author": "human-dev",
+    "branch": "claude/say-hi"
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Human Dev",
+        "email": "human-dev@example.com"
+      },
+      "message": "Say hi instead of hello",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ]
+}

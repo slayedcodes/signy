@@ -1,0 +1,14 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>)."
+  ],
+  "failures": [
+    {
+      "rule": "contract-commit-multiple",
+      "message": "The Contract Commit {{short:1}} adds 2 Change Contracts (.contracts/say-hello.json, .contracts/say-hi.json); a PR has exactly one.",
+      "commit": "{{sha:1}}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "description": "The team replaced the default rules: its own agent label counts, the default label no longer does.",
+  "pr": {
+    "author": "human-dev",
+    "labels": [
+      "agent-authored",
+      "robot-pr"
+    ]
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Human Dev",
+        "email": "human-dev@example.com"
+      },
+      "message": "Say hi instead of hello",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ],
+  "config": {
+    "agentDetection": {
+      "labels": [
+        "robot-pr"
+      ]
+    }
+  }
+}

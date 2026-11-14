@@ -66,6 +66,17 @@ describe('contract validate', () => {
     );
   });
 
+  it('exits 1 when the slug does not match the file name', () => {
+    writeContract('retry.json', validContract);
+
+    const run = contract('validate', '.contracts/retry.json');
+
+    expect(run.status).toBe(1);
+    expect(run.stderr).toContain(
+      '  /slug [slug-matches-file] slug "add-retry-to-billing-client" must match the file name; expected "retry".\n',
+    );
+  });
+
   it('exits 1 when the file is not valid JSON', () => {
     writeFileSync(join(repo, '.contracts', 'broken.json'), '{ "version": 1,');
 

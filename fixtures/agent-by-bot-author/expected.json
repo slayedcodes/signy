@@ -1,0 +1,13 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: its author copilot-swe-agent[bot] is a known agent account."
+  ],
+  "failures": [
+    {
+      "rule": "contract-missing",
+      "message": "This Agent-authored PR has no Change Contract. Run `contract init` to draft one, and make it the PR's first commit."
+    }
+  ]
+}
