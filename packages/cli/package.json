@@ -1,0 +1,16 @@
+{
+  "name": "@change-contract/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "contract": "./bin/contract.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@change-contract/core": "workspace:*",
+    "tsx": "^4.23.15"
+  }
+}

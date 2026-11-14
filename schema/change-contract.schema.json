@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unpkg.com/@change-contract/core/schema/change-contract.schema.json",
+  "title": "Change Contract",
+  "description": "A typed, machine-checkable statement of what one PR will and won't change. It is approved by a human before any code is written.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "slug", "summary", "scope"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Kebab-case name; the contract lives at .contracts/<slug>.json."
+    },
+    "issue": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "symbols"],
+      "properties": {
+        "files": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "symbols": { "type": "array", "items": { "$ref": "#/$defs/symbol" } }
+      }
+    },
+    "interface": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["symbol", "change"],
+        "properties": {
+          "symbol": { "$ref": "#/$defs/symbol" },
+          "change": { "enum": ["add", "modify", "remove"] },
+          "signature": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "change"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "change": { "enum": ["add", "remove", "bump"] },
+          "range": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "name", "change"],
+        "properties": {
+          "file": { "$ref": "#/$defs/path" },
+          "name": { "type": "string", "minLength": 1 },
+          "change": { "enum": ["add", "modify", "remove"] }
+        }
+      }
+    },
+    "mustNotChange": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/path" },
+          { "type": "string", "pattern": "^[^#\\s]+#\\*$" },
+          { "$ref": "#/$defs/symbol" }
+        ]
+      }
+    },
+    "forks": {
+      "type": "array",
+      "description": "Recorded only; v1 doesn't check them.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question", "options", "chosen"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "question": { "type": "string", "minLength": 1 },
+          "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "chosen": { "type": "string" },
+          "rationale": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "description": "Repo-relative path or glob, using forward slashes.",
+      "pattern": "^[^#\\s/\\\\][^#\\s\\\\]*$"
+    },
+    "symbol": {
+      "type": "string",
+      "description": "path#Name or path#Class.member",
+      "pattern": "^[^#\\s/\\\\][^#\\s\\\\]*#[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)?$"
+    }
+  }
+}

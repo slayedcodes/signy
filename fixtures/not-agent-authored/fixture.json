@@ -1,0 +1,22 @@
+{
+  "description": "A human-written PR with no agent markers: the gate does not apply.",
+  "pr": { "author": "human-dev" },
+  "bot": { "name": "change-contract[bot]", "email": "change-contract-bot@users.noreply.example.com" },
+  "config": {},
+  "base": {
+    "files": {
+      "package.json": "{ \"name\": \"pilot\", \"version\": \"1.0.0\" }\n",
+      "src/greet.ts": "export function greet(name: string): string {\n  return `Hello, ${name}`;\n}\n"
+    }
+  },
+  "commits": [
+    {
+      "author": { "name": "Human Dev", "email": "human-dev@example.com" },
+      "message": "Say hi instead of hello",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n"
+      }
+    }
+  ],
+  "comments": []
+}
