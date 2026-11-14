@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { validateContract } from '@change-contract/core';
+import { check } from './check.js';
 
 export interface Io {
   cwd: string;
@@ -14,7 +15,8 @@ const CONTRACTS_DIR = '.contracts';
 export async function main(args: string[], io: Io): Promise<number> {
   const [command, ...rest] = args;
   if (command === 'validate') return validate(rest, io);
-  io.stderr(`Unknown command: ${command ?? '(none)'}\nUsage: contract validate [file]\n`);
+  if (command === 'check') return check(rest, io);
+  io.stderr(`Unknown command: ${command ?? '(none)'}\nUsage: contract validate [file] | contract check --base <ref>\n`);
   return 2;
 }
 

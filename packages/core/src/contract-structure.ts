@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import type { FileChange, GateCommit, GateFailure, GateInput } from './gate.js';
+import type { FileChange, GateCommit, GateFailure, GateInput } from './types.js';
 import { listAnd, shortSha } from './text.js';
-import { validateContract } from './validate-contract.js';
+import { validateContract, type ChangeContract } from './validate-contract.js';
 
 /** The one Change Contract the Contract Commit added. */
 export interface LocatedContract {
@@ -9,6 +9,8 @@ export interface LocatedContract {
   commit: GateCommit;
   /** `sha256:<hex>` of the file's exact content: the Contract Version that gets approved. */
   hash: string;
+  /** The parsed contract, when it passes the schema. */
+  document?: ChangeContract;
 }
 
 export interface StructureCheck {
@@ -73,21 +75,28 @@ export async function checkContractStructure(input: GateInput): Promise<Structur
   if (added.length !== 1) return { failures };
   const path = added[0]!.path;
   const content = (await input.git.readFile(first.sha, path)) ?? '';
-  failures.push(...checkContractValidity(path, content, first));
-  return { contract: { path, commit: first, hash: contractHash(content) }, failures };
+  const validity = checkContractValidity(path, content, first);
+  failures.push(...validity.failures);
+  return { contract: { path, commit: first, hash: contractHash(content), document: validity.document }, failures };
 }
 
-function checkContractValidity(path: string, content: string, commit: GateCommit): GateFailure[] {
+function checkContractValidity(
+  path: string,
+  content: string,
+  commit: GateCommit,
+): { failures: GateFailure[]; document?: ChangeContract } {
   const invalid = (message: string): GateFailure => ({ rule: 'contract-invalid', message, commit: commit.sha });
   let parsed: unknown;
   try {
     parsed = JSON.parse(content);
   } catch {
-    return [invalid(`${path} is not valid JSON.`)];
+    return { failures: [invalid(`${path} is not valid JSON.`)] };
   }
-  return validateContract(parsed, { file: path }).errors.map((e) =>
-    invalid(`${path} ${e.path || '/'} [${e.rule}] ${e.message}`),
-  );
+  const { errors } = validateContract(parsed, { file: path });
+  const failures = errors.map((e) => invalid(`${path} ${e.path || '/'} [${e.rule}] ${e.message}`));
+  // Lint failures still leave a well-formed contract that Deviation detection can use.
+  const schemaValid = errors.every((e) => e.rule !== 'schema');
+  return schemaValid ? { failures, document: parsed as ChangeContract } : { failures };
 }
 
 export function contractHash(content: string): string {

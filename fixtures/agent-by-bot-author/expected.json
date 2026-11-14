@@ -9,5 +9,7 @@
       "rule": "contract-missing",
       "message": "This Agent-authored PR has no Change Contract. Run `contract init` to draft one, and make it the PR's first commit."
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": []
 }

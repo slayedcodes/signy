@@ -1,0 +1,23 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>).",
+    "Change Contract .contracts/say-hi.json approved by reviewer in Approval Commit {{short:3}}."
+  ],
+  "failures": [
+    {
+      "rule": "approval-after-code",
+      "message": "Commit {{short:2}} contains code but doesn't build on the Approval Commit {{short:3}}. Code commits are allowed only after the Contract Approval; drop or rebase them, then re-approve.",
+      "commit": "{{sha:2}}"
+    }
+  ],
+  "deviations": [],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:3}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
+}

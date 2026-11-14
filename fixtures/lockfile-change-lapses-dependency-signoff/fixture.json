@@ -1,0 +1,66 @@
+{
+  "description": "An accepted dependency addition; a later push changes only the lockfile, so the Sign-off lapses.",
+  "pr": {
+    "author": "agent-operator"
+  },
+  "commits": [
+    {
+      "author": {
+        "name": "Agent Operator",
+        "email": "operator@example.com"
+      },
+      "message": "Add Change Contract: say-hi\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        ".contracts/say-hi.json": "{\n  \"version\": 1,\n  \"slug\": \"say-hi\",\n  \"summary\": \"Greet with hi.\",\n  \"scope\": { \"files\": [\"src/greet.ts\"], \"symbols\": [\"src/greet.ts#greet\"] }\n}\n"
+      }
+    },
+    {
+      "author": {
+        "name": "change-contract[bot]",
+        "email": "change-contract-bot@users.noreply.example.com"
+      },
+      "message": "Approve Change Contract say-hi\n\nContract-Hash: {{contractHash}}\nApproved-By: reviewer\nApproval-Comment: https://code.example/pr/1#comment-1",
+      "files": {}
+    },
+    {
+      "author": {
+        "name": "Agent Operator",
+        "email": "operator@example.com"
+      },
+      "message": "Say hi instead of hello\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "files": {
+        "src/greet.ts": "export function greet(name: string): string {\n  return `Hi, ${name}`;\n}\n",
+        "package.json": "{\n  \"name\": \"pilot\",\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"left-pad\": \"^1.3.0\"\n  }\n}\n",
+        "pnpm-lock.yaml": "lockfileVersion: '9.0'\n# left-pad\n"
+      }
+    },
+    {
+      "author": {
+        "name": "Agent Operator",
+        "email": "operator@example.com"
+      },
+      "message": "Repoint left-pad",
+      "files": {
+        "pnpm-lock.yaml": "lockfileVersion: '9.0'\n# left-pad from https://evil.example\n"
+      }
+    }
+  ],
+  "comments": [
+    {
+      "author": "reviewer",
+      "permission": "write",
+      "isBot": false,
+      "createdAt": "2023-11-14T22:15:00Z",
+      "url": "https://code.example/pr/1#comment-1",
+      "body": "Looks right.\n/contract approve"
+    },
+    {
+      "author": "reviewer",
+      "permission": "write",
+      "isBot": false,
+      "createdAt": "2023-11-14T23:02:00Z",
+      "url": "https://code.example/pr/1#comment-2",
+      "body": "/signoff {{id:unplanned-change:dependencies:left-pad@3}} accept \"Tiny and stable.\""
+    }
+  ]
+}

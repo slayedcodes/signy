@@ -11,5 +11,13 @@
       "message": ".contracts/say-hi.json /slug [slug-matches-file] slug \"say-hello\" must match the file name; expected \"say-hi\".",
       "commit": "{{sha:1}}"
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
 }

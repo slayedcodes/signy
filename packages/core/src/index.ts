@@ -1,17 +1,13 @@
 export { validateContract } from './validate-contract.js';
-export type { ContractValidationError, ContractValidationResult } from './validate-contract.js';
-export { runGate } from './gate.js';
 export type {
-  BotIdentity,
-  CommitAuthor,
-  FileChange,
-  FileChangeStatus,
-  GateComment,
-  GateCommit,
-  GateFailure,
-  GateInput,
-  GateResult,
-  GitReader,
-  Permission,
-} from './gate.js';
-export type { AgentDetectionConfig, GateConfig } from './config.js';
+  ChangeContract,
+  ContractValidationError,
+  ContractValidationResult,
+  ValidateOptions,
+} from './validate-contract.js';
+export { runGate } from './gate.js';
+export { renderSummary } from './render.js';
+export { buildRunSummary, type RunSummary } from './run-summary.js';
+export { GATE_CONFIG_FILE } from './config.js';
+export type * from './types.js';
+export type { AgentDetectionConfig, GateConfig, SignoffPolicyConfig } from './config.js';

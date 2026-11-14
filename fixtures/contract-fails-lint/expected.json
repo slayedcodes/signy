@@ -11,5 +11,13 @@
       "message": ".contracts/say-hi.json /scope/files/0 [scope-glob-too-wide] \"src/**\" matches more than one directory level; list the files or use a single-level glob such as \"src/billing/*\".",
       "commit": "{{sha:1}}"
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
 }

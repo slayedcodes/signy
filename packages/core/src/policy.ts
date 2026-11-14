@@ -1,5 +1,5 @@
 import type { ResolvedConfig } from './config.js';
-import type { GateComment } from './gate.js';
+import type { GateComment } from './types.js';
 import { listOr, sameLogin } from './text.js';
 
 /**

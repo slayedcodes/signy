@@ -1,13 +1,14 @@
-import { parseApproveCommands } from './comment-commands.js';
+import { parseComment } from './comment-commands.js';
 import type { ResolvedConfig } from './config.js';
 import type { LocatedContract } from './contract-structure.js';
-import type { GateCommit, GateComment, GateFailure, GateInput } from './gate.js';
+import type { ContractApproval, GateCommit, GateComment, GateFailure, GateInput } from './types.js';
 import { refusalUnderPolicy } from './policy.js';
 import { listAnd, sameLogin, shortSha } from './text.js';
 import { readTrailers } from './trailers.js';
 
 export interface ApprovalCheck {
   note?: string;
+  approval?: ContractApproval;
   failures: GateFailure[];
 }
 
@@ -17,13 +18,13 @@ const APPROVAL_TRAILERS = ['Contract-Hash', 'Approved-By', 'Approval-Comment'] a
 export function checkApproval(input: GateInput, contract: LocatedContract, config: ResolvedConfig): ApprovalCheck {
   const afterContractCommit = input.commits.slice(input.commits.indexOf(contract.commit) + 1);
   const failures: GateFailure[] = [];
-  let approval: { index: number; comment: GateComment } | undefined;
+  let approval: { index: number; approver: string; comment?: GateComment } | undefined;
 
   afterContractCommit.forEach((commit, index) => {
     if (!claimsToBeApproval(commit, input)) return;
     const verdict = verifyApprovalCommit(commit, input, contract, config);
     failures.push(...verdict.failures);
-    if (verdict.comment && !approval) approval = { index, comment: verdict.comment };
+    if (verdict.approver !== undefined && !approval) approval = { index, approver: verdict.approver, comment: verdict.comment };
   });
 
   if (!approval) {
@@ -35,16 +36,23 @@ export function checkApproval(input: GateInput, contract: LocatedContract, confi
   }
 
   const approvalCommit = afterContractCommit[approval.index]!;
-  const earlyCode = afterContractCommit.slice(0, approval.index).find((commit) => commit.files.length > 0);
+  // Order is ancestry, not list position: code on a side branch merged in later never built on the approval.
+  const builtOnApproval = descendantsOf(approvalCommit.sha, input.commits);
+  const earlyCode = afterContractCommit.find((commit) => commit.files.length > 0 && !builtOnApproval.has(commit.sha));
   if (earlyCode) {
     failures.push({
       rule: 'approval-after-code',
-      message: `Commit ${shortSha(earlyCode.sha)} contains code but comes before the Approval Commit ${shortSha(approvalCommit.sha)}. Code commits are allowed only after the Contract Approval; drop or rebase them, then re-approve.`,
+      message: `Commit ${shortSha(earlyCode.sha)} contains code but doesn't build on the Approval Commit ${shortSha(approvalCommit.sha)}. Code commits are allowed only after the Contract Approval; drop or rebase them, then re-approve.`,
       commit: earlyCode.sha,
     });
   }
   return {
-    note: `Change Contract ${contract.path} approved by ${approval.comment.author} in Approval Commit ${shortSha(approvalCommit.sha)}.`,
+    note: `Change Contract ${contract.path} approved by ${approval.approver} in Approval Commit ${shortSha(approvalCommit.sha)}.`,
+    approval: {
+      by: approval.approver,
+      commit: approvalCommit.sha,
+      ...(approval.comment ? { commentUrl: approval.comment.url, approvedAt: approval.comment.createdAt } : {}),
+    },
     failures,
   };
 }
@@ -63,7 +71,7 @@ function verifyApprovalCommit(
   input: GateInput,
   contract: LocatedContract,
   config: ResolvedConfig,
-): { failures: GateFailure[]; comment?: GateComment } {
+): { failures: GateFailure[]; approver?: string; comment?: GateComment } {
   const failures: GateFailure[] = [];
   const fail = (rule: string, message: string) =>
     failures.push({ rule, message: `Commit ${shortSha(commit.sha)} ${message}`, commit: commit.sha });
@@ -97,6 +105,9 @@ function verifyApprovalCommit(
     );
   }
 
+  // Locally there are no comments: the commit-level checks are all `contract check` can do.
+  if (input.local) return failures.length === 0 ? { failures, approver: approvedBy } : { failures };
+
   const comment = input.comments.find((c) => c.url === commentUrl);
   if (!comment) {
     fail('approval-comment-missing', `cites Approval-Comment ${commentUrl}, but the PR has no such comment.`);
@@ -115,14 +126,23 @@ function verifyApprovalCommit(
       `records a Contract Approval by ${comment.author}, whom the Sign-off Policy doesn't allow: ${refusal}`,
     );
   }
-  const approves = parseApproveCommands(comment.body).some((cmd) => (cmd.hash ?? contract.hash) === approvedHash);
+  const approves = parseComment(comment.body).approvals.some((cmd) => (cmd.hash ?? contract.hash) === approvedHash);
   if (!approves) {
     fail(
       'approval-comment-command',
       `cites Approval-Comment ${commentUrl}, which has no \`/contract approve\` command for ${approvedHash}.`,
     );
   }
-  return failures.length === 0 ? { failures, comment } : { failures };
+  return failures.length === 0 ? { failures, approver: comment.author, comment } : { failures };
+}
+
+/** The commit itself plus every listed commit that has it as an ancestor. Commits come parents-first. */
+function descendantsOf(sha: string, commits: GateCommit[]): Set<string> {
+  const descendants = new Set([sha]);
+  for (const commit of commits) {
+    if (commit.parents.some((parent) => descendants.has(parent))) descendants.add(commit.sha);
+  }
+  return descendants;
 }
 
 function isAuthoredByBot(commit: GateCommit, input: GateInput): boolean {

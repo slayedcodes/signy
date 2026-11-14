@@ -1,4 +1,4 @@
-import type { Permission } from './gate.js';
+import type { BotIdentity, Permission } from './types.js';
 
 /** Rules that mark a PR as an Agent-authored PR. Any match counts. */
 export interface AgentDetectionConfig {
@@ -27,12 +27,20 @@ export interface SignoffPolicyConfig {
 export interface GateConfig {
   agentDetection?: AgentDetectionConfig;
   signoffPolicy?: SignoffPolicyConfig;
+  /** Globs for CI and config files; changing one outside the scope is a ci-config Deviation. */
+  ciConfigFiles?: string[];
+  /** The gate bot's git identity. Read by the CLI and host adapters to fill `GateInput.bot`. */
+  bot?: BotIdentity;
 }
 
 export interface ResolvedConfig {
   agentDetection: Required<AgentDetectionConfig>;
   signoffPolicy: Required<SignoffPolicyConfig>;
+  ciConfigFiles: string[];
 }
+
+/** Where a repo keeps its gate config. The gate reads it from the base branch, never from the PR. */
+export const GATE_CONFIG_FILE = '.change-contract.json';
 
 const DEFAULTS: ResolvedConfig = {
   agentDetection: {
@@ -47,6 +55,20 @@ const DEFAULTS: ResolvedConfig = {
     permissions: ['admin', 'maintain', 'write'],
     allowPrAuthor: false,
   },
+  ciConfigFiles: [
+    '.github/**',
+    '.gitlab-ci.yml',
+    '**/tsconfig*.json',
+    '**/.eslintrc*',
+    '**/eslint.config.*',
+    '**/.prettierrc*',
+    '**/prettier.config.*',
+    '**/biome.json',
+    '**/jest.config.*',
+    '**/vitest.config.*',
+    '.npmrc',
+    GATE_CONFIG_FILE,
+  ],
 };
 
 /** Fills every setting the team's config leaves out with its default. Lists replace, not merge. */
@@ -54,5 +76,6 @@ export function resolveConfig(config: GateConfig): ResolvedConfig {
   return {
     agentDetection: { ...DEFAULTS.agentDetection, ...config.agentDetection },
     signoffPolicy: { ...DEFAULTS.signoffPolicy, ...config.signoffPolicy },
+    ciConfigFiles: config.ciConfigFiles ?? DEFAULTS.ciConfigFiles,
   };
 }

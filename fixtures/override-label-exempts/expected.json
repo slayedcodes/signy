@@ -4,5 +4,7 @@
   "notes": [
     "The contract:exempt label marks this PR as not agent-authored; the Change Contract gate does not apply."
   ],
-  "failures": []
+  "failures": [],
+  "deviations": [],
+  "commandErrors": []
 }

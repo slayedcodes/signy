@@ -14,6 +14,20 @@ export interface ContractValidationResult {
   errors: ContractValidationError[];
 }
 
+/** A Change Contract as the v1 schema defines it. */
+export interface ChangeContract {
+  version: 1;
+  slug: string;
+  issue?: string;
+  summary: string;
+  scope: { files: string[]; symbols: string[] };
+  interface?: Array<{ symbol: string; change: 'add' | 'modify' | 'remove'; signature?: string }>;
+  dependencies?: Array<{ name: string; change: 'add' | 'remove' | 'bump'; range?: string }>;
+  tests?: Array<{ file: string; name: string; change: 'add' | 'modify' | 'remove' }>;
+  mustNotChange?: string[];
+  forks?: Array<{ id: string; question: string; options: string[]; chosen: string; rationale?: string }>;
+}
+
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const checkSchema = ajv.compile(schema);
 
@@ -33,17 +47,11 @@ export function validateContract(contract: unknown, options: ValidateOptions = {
     return { ok: false, errors };
   }
   // Lint assumes the schema's shape, so it only runs on schema-valid contracts.
-  const errors = lintContract(contract as unknown as ChangeContractShape, options);
+  const errors = lintContract(contract as unknown as ChangeContract, options);
   return { ok: errors.length === 0, errors };
 }
 
-interface ChangeContractShape {
-  slug: string;
-  scope: { files: string[]; symbols: string[] };
-  interface?: Array<{ symbol: string }>;
-}
-
-function lintContract(contract: ChangeContractShape, options: ValidateOptions): ContractValidationError[] {
+function lintContract(contract: ChangeContract, options: ValidateOptions): ContractValidationError[] {
   const errors: ContractValidationError[] = [];
   const expectedSlug = options.file?.split(/[\\/]/).at(-1)?.replace(/\.json$/, '');
   if (expectedSlug !== undefined && contract.slug !== expectedSlug) {

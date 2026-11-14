@@ -41,7 +41,7 @@ A human's recorded decision on one Deviation. It is either **Accept** (a reason 
 _Avoid_: Approval (that word is reserved for the PR as a whole)
 
 **Deviation Fingerprint**:
-The identity of one Deviation, made of its kind, its target and its content. A Sign-off stays valid only while the fingerprint is unchanged.
+The identity of one Deviation, made of its kind (including which check found it), its target and its content. A Sign-off stays valid only while the fingerprint is unchanged.
 
 **Sign-off Policy**:
 A team's rule for who may give Sign-offs and Contract Approvals. By default this is any human with write access, except the PR author.

@@ -4,5 +4,7 @@
   "notes": [
     "Not an Agent-authored PR; the Change Contract gate does not apply."
   ],
-  "failures": []
+  "failures": [],
+  "deviations": [],
+  "commandErrors": []
 }

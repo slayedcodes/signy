@@ -1,5 +1,5 @@
 import type { ResolvedConfig } from './config.js';
-import type { GateInput } from './gate.js';
+import type { GateInput } from './types.js';
 import { shortSha } from './text.js';
 import { readTrailers } from './trailers.js';
 
@@ -20,6 +20,7 @@ export function detectAgent(input: GateInput, config: ResolvedConfig): AgentDete
   const { pr } = input;
   const agent = (reason: string): AgentDetection => ({ agentAuthored: true, note: `Agent-authored PR: ${reason}.` });
 
+  if (input.local) return agent('checked locally with `contract check`, which assumes it is one');
   if (pr.labels.includes(rules.requireLabel)) return agent(`the ${rules.requireLabel} label marks it as one`);
   if (pr.labels.includes(rules.exemptLabel)) {
     return {

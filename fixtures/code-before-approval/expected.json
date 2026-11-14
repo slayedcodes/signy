@@ -8,8 +8,16 @@
   "failures": [
     {
       "rule": "approval-after-code",
-      "message": "Commit {{short:2}} contains code but comes before the Approval Commit {{short:3}}. Code commits are allowed only after the Contract Approval; drop or rebase them, then re-approve.",
+      "message": "Commit {{short:2}} contains code but doesn't build on the Approval Commit {{short:3}}. Code commits are allowed only after the Contract Approval; drop or rebase them, then re-approve.",
       "commit": "{{sha:2}}"
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:3}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
 }

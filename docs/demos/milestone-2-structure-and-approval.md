@@ -67,13 +67,9 @@ Fixtures support three placeholders. In `fixture.json` and `expected.json`, `{{c
 
 ## Open items
 
-- **Approval replay (needs a design decision).** The bot's identity is matched on the git author name and email, which anyone can set. So the proof of approval is the comment match: an allowed human approved this exact hash. But that doesn't prove *when* the approval happened relative to the code. Suppose an agent pushes contract → code, and a reviewer then approves, so the bot's Approval Commit lands after the code. The gate fails correctly. The agent can then rewrite history to contract → Approval Commit (or a copy of it) → code, and the gate passes, even though the code existed before the human approved. Commit dates can't settle the order because they can be faked. Possible fixes:
-  - in milestone 6, have the adapter confirm that the host verified the bot's signature on the Approval Commit, and that the comment's timestamp is earlier than the host's push time for every code commit
-  - forbid force-pushes on agent branches
-- **Merge commits (needs a design decision).** `readCommits` lists no files for merge commits. So a merge could change `.contracts/` or bring in code without the structure or approval-order rules seeing it. One option is to fail any Agent-authored PR that contains a merge commit. The other is to diff each merge against its first parent; then merging the base branch would count as code, and any contracts from other PRs it brings in would trip `contract-changed-later`.
-- **Not in the spec, so please confirm:**
-  - the `slug-matches-file` lint rule (§4 lists only three lint rules)
-  - `contract:required` winning when both override labels are present
+- **Approval replay: decided.** An agent could rewrite history so that an Approval Commit (or a copy) sits in front of code written before the approval. The host adapter will verify ordering using the host's signature and push records in milestone 6 (ADR 0003). An external store of commit hashes is recorded there as a future option.
+- **Merge commits: resolved in milestone 3.** Each merge is compared with its parents. Only paths that differ from every parent count as the merge's own changes.
+- **Confirmed and kept:** the `slug-matches-file` lint rule, and `contract:required` winning when both override labels are present.
 - **Anyone who can apply labels can apply `contract:exempt`.** The gate stores no state, so it can't tell who added a label. Teams that need to can restrict label permissions on the host.
 - **The default `agentAccounts` logins are a best guess.** Check them during the pilot (milestone 8).
-- **Malformed `/contract approve` lines are currently ignored.** §6 requires a reply explaining the syntax, which arrives with comment handling in milestones 3 and 6.
+- **Malformed `/contract approve` lines: resolved in milestone 3.** They are reported as `commandErrors`. The adapter's replies come in milestone 6.

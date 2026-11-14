@@ -14,5 +14,7 @@
       "rule": "approval-missing",
       "message": "No valid Approval Commit for Change Contract .contracts/say-hi.json ({{contractHash}}). A reviewer approves it by commenting `/contract approve` on the PR."
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": []
 }

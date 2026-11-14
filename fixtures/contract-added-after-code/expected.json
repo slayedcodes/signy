@@ -15,5 +15,7 @@
       "message": "Commit {{short:2}} adds .contracts/say-hi.json. After the Contract Commit no commit may add, delete or edit anything under .contracts/; a change of scope needs a new Contract Version and a fresh Contract Approval.",
       "commit": "{{sha:2}}"
     }
-  ]
+  ],
+  "deviations": [],
+  "commandErrors": []
 }

@@ -127,8 +127,8 @@ Run these checks in order, and collect every failure. Don't stop at the first on
    - **Must-not-change:** any change matching an entry → Unplanned Change, regardless of scope.
    - **CI or config files** (workflows, `tsconfig`, lint configs, the gate config) count as Unplanned Changes unless they're in scope.
 5. **Fingerprint and IDs.**
-   - Fingerprint = `sha256(kind + target + normalized content)`.
-   - The display ID (`D1`, `D2`, …) is assigned from the fingerprint so it stays stable across runs.
+   - Fingerprint = `sha256(kind + check + target + normalized content)`. The check (scope, dependencies, …) refines the kind (ADR 0004).
+   - The display ID is `D` plus the first 16 hex characters of the fingerprint, so it stays stable across runs and a changed Deviation can't take over an accepted ID (ADR 0004).
 6. **Sign-offs.**
    - Parse `/signoff` comments.
    - Keep only those whose author the policy allows and whose fingerprint still matches.
@@ -161,6 +161,7 @@ Run these checks in order, and collect every failure. Don't stop at the first on
   4. Make sure this can't loop.
 - Report results as a check run named `change-contract`, and keep one PR comment updated in place with the summary.
 - Get commenter permission from the collaborator permission API. Detect bots by account type.
+- Verify approval ordering with host data: a verified bot signature on the Approval Commit, and an approval comment older than every later code push (ADR 0003).
 - Upload `run-summary.json` as a workflow artifact.
 
 ## 8. CLI (`contract`)
