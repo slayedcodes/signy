@@ -44,6 +44,7 @@ A private repo, `slayedcodes/signy-sandbox`, uses the workflow from the README w
 | Comment `/contract approve` | The bot pushed `7863d72 Approve Change Contract say-hi`. GitHub lists it as authored by github-actions[bot] with `verification.verified: true` (`valid`), confirming ADR 0003's assumption. `change-contract` passed, and the summary comment was posted. |
 | Push the code: `greet` changed, plus a new `src/farewell.ts` | `change-contract` failed with one Unplanned Change, `src/farewell.ts` (`D8939828e4808adf2`). The run summary artifact was uploaded. |
 | Comment `/signoff D8939828e4808adf2 accept "…"` | `change-contract` passed. The run summary records 1 Deviation, 1 accepted Sign-off and an approval latency of 53 s. |
+| After the fix below: comment `/contract aprove` | The bot replied `> /contract aprove` / `@slayedcodes Unknown command. The gate understands …`, and updated the existing summary comment in place, without adding another. |
 
 **Bug found by the demo, and fixed:**
 - **What happened:** the last run posted a *second* summary comment instead of updating the first.
