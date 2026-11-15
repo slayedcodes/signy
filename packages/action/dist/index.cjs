@@ -219980,7 +219980,7 @@ var GitHubApi = class {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       comments(first: 100, after: $after) {
-        nodes { databaseId editor { login } }
+        nodes { databaseId editor { login __typename } }
         pageInfo { hasNextPage endCursor }
       }
     }
@@ -220000,7 +220000,9 @@ var GitHubApi = class {
         throw new GitHubApiError(response.status, "POST /graphql", json.errors?.[0]?.message ?? response.statusText);
       }
       const page = json.data.repository.pullRequest.comments;
-      for (const node of page.nodes) if (node.editor?.login) editors.set(node.databaseId, node.editor.login);
+      for (const node of page.nodes) {
+        if (node.editor?.login) editors.set(node.databaseId, node.editor.__typename === "Bot" ? `${node.editor.login}[bot]` : node.editor.login);
+      }
       after = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
     } while (after);
     return editors;

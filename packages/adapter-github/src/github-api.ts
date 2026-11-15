@@ -136,7 +136,7 @@ export class GitHubApi {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       comments(first: 100, after: $after) {
-        nodes { databaseId editor { login } }
+        nodes { databaseId editor { login __typename } }
         pageInfo { hasNextPage endCursor }
       }
     }
@@ -156,7 +156,10 @@ export class GitHubApi {
         throw new GitHubApiError(response.status, 'POST /graphql', json.errors?.[0]?.message ?? response.statusText);
       }
       const page = json.data.repository.pullRequest.comments;
-      for (const node of page.nodes) if (node.editor?.login) editors.set(node.databaseId, node.editor.login);
+      // GraphQL names a bot `github-actions`; REST, and so the rest of the gate, names it `github-actions[bot]`.
+      for (const node of page.nodes) {
+        if (node.editor?.login) editors.set(node.databaseId, node.editor.__typename === 'Bot' ? `${node.editor.login}[bot]` : node.editor.login);
+      }
       after = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
     } while (after);
     return editors;

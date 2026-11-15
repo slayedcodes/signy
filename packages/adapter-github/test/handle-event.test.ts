@@ -229,6 +229,25 @@ describe('handleEvent', () => {
     expect(gh.writes()[0]!.body.body).toContain("@reviewer This PR isn't an Agent-authored PR, so the Change Contract gate doesn't apply and ignores commands.");
   });
 
+  it('still recognizes its summary comment after editing it (GraphQL names bots without [bot])', async () => {
+    const summary: FakeComment = {
+      id: 78,
+      login: 'github-actions[bot]',
+      bot: true,
+      editor: 'github-actions[bot]',
+      body: '<!-- change-contract-summary -->\nold',
+      createdAt: '2023-11-14T22:20:00Z',
+    };
+    const { gh, deps } = await scenario({ commits: [contractCommit, approvalCommit(), codeCommit()], verified: [2], comments: [approveComment, summary] });
+
+    await handleEvent(pullRequestEvent(), deps);
+
+    expect(gh.writes().map((w) => `${w.method} ${w.path}`)).toEqual([
+      'POST /repos/acme/pilot/check-runs',
+      'PATCH /repos/acme/pilot/issues/comments/78',
+    ]);
+  });
+
   it('ignores comments by bots, so its own summary comment never triggers a run', async () => {
     const { gh, deps } = await scenario({ commits: [contractCommit] });
 

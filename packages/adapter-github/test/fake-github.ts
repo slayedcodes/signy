@@ -73,7 +73,10 @@ export function fakeGitHub(state: FakeState) {
     const route = `${method} ${path}`;
     let m: RegExpExecArray | null;
     if (route === 'POST /graphql') {
-      const nodes = state.comments.map((c) => str({ databaseId: c.id, editor: c.editor ? { login: c.editor } : null }));
+      // GraphQL names a bot without the "[bot]" suffix the REST API adds, as GitHub does.
+      const actor = (login: string) =>
+        login.endsWith('[bot]') ? { login: login.slice(0, -5), __typename: 'Bot' } : { login, __typename: 'User' };
+      const nodes = state.comments.map((c) => str({ databaseId: c.id, editor: c.editor ? actor(c.editor) : null }));
       return [200, fill('graphql-comment-editors', { nodes: nodes.join(',') })];
     }
     if (route === 'GET /repos/acme/pilot/pulls/7') {

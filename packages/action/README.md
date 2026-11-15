@@ -17,8 +17,8 @@ on:
 permissions:
   contents: write       # push Approval Commits
   checks: write         # the change-contract check run
-  pull-requests: read
-  issues: write         # the summary comment and replies
+  pull-requests: write  # the summary comment and replies on the PR
+  issues: write
 
 # No `concurrency` group: GitHub keeps only one pending run per group and drops the rest,
 # which could drop the run for a `/contract approve`. Overlapping runs are safe: the
