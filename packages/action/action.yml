@@ -1,0 +1,17 @@
+name: Change Contract gate
+description: Checks agent-authored PRs against their approved Change Contract, and records Contract Approvals as Approval Commits.
+inputs:
+  github-token:
+    description: Token for the GitHub API. GITHUB_TOKEN is what makes Approval Commits verified as github-actions[bot].
+    default: ${{ github.token }}
+  run-summary:
+    description: Where to write run-summary.json, relative to the workspace.
+    default: change-contract-run-summary.json
+outputs:
+  status:
+    description: pass, fail, or skipped when the event isn't about a PR (or came from a bot).
+  run-summary:
+    description: Path of the run summary file, when the gate ran.
+runs:
+  using: node24
+  main: dist/index.cjs

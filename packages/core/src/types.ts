@@ -29,6 +29,8 @@ export interface GateCommit {
   files: FileChange[];
   /** Committer date (ISO 8601). Settable by anyone, so it feeds metrics only, never a rule. */
   committedAt?: string;
+  /** Whether the code host verified the commit's signature; set only when `GateInput.hostVerifiesSignatures`. */
+  signatureVerified?: boolean;
 }
 
 export type Permission = 'admin' | 'maintain' | 'write' | 'triage' | 'read' | 'none';
@@ -62,6 +64,11 @@ export interface GateInput {
    * and can't verify approval comments or Sign-offs.
    */
   local?: boolean;
+  /**
+   * The host adapter reports `signatureVerified` on every commit. The gate then trusts only an
+   * Approval Commit the host verified, since only the gate's push gets the host's signature (ADR 0003).
+   */
+  hostVerifiesSignatures?: boolean;
 }
 
 export interface GateFailure {

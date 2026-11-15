@@ -1,0 +1,8 @@
+{
+  "sha": "{{sha}}",
+  "commit": {
+    "message": "…",
+    "verification": { "verified": {{verified}}, "reason": "{{reason}}", "signature": null, "payload": null }
+  },
+  "html_url": "https://github.com/acme/pilot/commit/{{sha}}"
+}

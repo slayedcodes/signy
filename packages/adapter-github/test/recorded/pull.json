@@ -1,0 +1,22 @@
+{
+  "url": "https://api.github.com/repos/acme/pilot/pulls/7",
+  "html_url": "https://github.com/acme/pilot/pull/7",
+  "number": 7,
+  "state": "open",
+  "title": "Say hi instead of hello",
+  "user": { "login": "{{prAuthor}}", "id": 1001, "type": "User" },
+  "labels": [{{labels}}],
+  "head": {
+    "label": "acme:{{branch}}",
+    "ref": "{{branch}}",
+    "sha": "{{head}}",
+    "repo": { "full_name": "{{headRepo}}" }
+  },
+  "base": {
+    "label": "acme:main",
+    "ref": "main",
+    "sha": "{{base}}",
+    "repo": { "full_name": "acme/pilot" }
+  },
+  "draft": false
+}

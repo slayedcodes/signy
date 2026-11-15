@@ -1,0 +1,10 @@
+{
+  "sha": "{{sha}}",
+  "url": "https://api.github.com/repos/acme/pilot/git/commits/{{sha}}",
+  "author": { "name": "github-actions[bot]", "email": "41898282+github-actions[bot]@users.noreply.github.com", "date": "2023-11-14T22:16:00Z" },
+  "committer": { "name": "GitHub", "email": "noreply@github.com", "date": "2023-11-14T22:16:00Z" },
+  "tree": { "sha": "{{tree}}" },
+  "message": {{message}},
+  "parents": [{{parents}}],
+  "verification": { "verified": true, "reason": "valid", "signature": "-----BEGIN PGP SIGNATURE-----…", "payload": "…" }
+}

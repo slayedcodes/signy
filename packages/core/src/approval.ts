@@ -16,7 +16,7 @@ const APPROVAL_TRAILERS = ['Contract-Hash', 'Approved-By', 'Approval-Comment'] a
 
 /** Step 3 of the gate: a genuine Approval Commit precedes every code commit. */
 export function checkApproval(input: GateInput, contract: LocatedContract, config: ResolvedConfig): ApprovalCheck {
-  const afterContractCommit = input.commits.slice(input.commits.indexOf(contract.commit) + 1);
+  const afterContractCommit = commitsAfter(contract, input.commits);
   const failures: GateFailure[] = [];
   let approval: { index: number; approver: string; comment?: GateComment } | undefined;
 
@@ -57,6 +57,11 @@ export function checkApproval(input: GateInput, contract: LocatedContract, confi
   };
 }
 
+/** The PR's commits after the Contract Commit, in order. */
+export function commitsAfter(contract: LocatedContract, commits: GateCommit[]): GateCommit[] {
+  return commits.slice(commits.indexOf(contract.commit) + 1);
+}
+
 /**
  * A commit claims to be an Approval Commit if the gate bot authored it or it carries
  * a Contract-Hash trailer. Other trailers (Approved-By is a common team convention) don't count.
@@ -80,6 +85,12 @@ function verifyApprovalCommit(
     fail(
       'approval-not-bot',
       `looks like an Approval Commit but was authored by ${commit.author.name} <${commit.author.email}>, not the gate bot ${input.bot.name} <${input.bot.email}>.`,
+    );
+  }
+  if (input.hostVerifiesSignatures && !commit.signatureVerified) {
+    fail(
+      'approval-not-verified',
+      "is an Approval Commit, but the code host hasn't verified its signature. Only the gate pushes Approval Commits, and the host signs them.",
     );
   }
   if (commit.files.length > 0) {

@@ -21,6 +21,8 @@ export interface FixtureCommit {
   parent?: number;
   /** Make this a merge of PR commit N (1-based), which must sit on a one-commit side branch. */
   merge?: number;
+  /** What the code host reports about this commit's signature, when the fixture's host verifies signatures. */
+  signatureVerified?: boolean;
 }
 
 /** fixture.json as written on disk; every field but `description`, `pr.author` and `commits` has a default. */
@@ -34,6 +36,8 @@ export interface FixtureSpec {
   baseUpdates?: FixtureCommit[];
   commits: FixtureCommit[];
   comments?: GateComment[];
+  /** Facts a host adapter supplies, e.g. that it verifies commit signatures. */
+  host?: { verifiesSignatures?: boolean };
 }
 
 export interface Fixture {
@@ -47,6 +51,7 @@ export interface Fixture {
   baseUpdates: FixtureCommit[];
   commits: FixtureCommit[];
   comments: GateComment[];
+  host: { verifiesSignatures?: boolean };
 }
 
 export interface FixtureRepo {
@@ -89,6 +94,7 @@ export function loadFixture(text: string): Fixture {
     baseUpdates: spec.baseUpdates ?? [],
     commits: spec.commits,
     comments: spec.comments ?? [],
+    host: spec.host ?? {},
   };
 }
 

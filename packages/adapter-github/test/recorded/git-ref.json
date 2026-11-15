@@ -1,0 +1,5 @@
+{
+  "ref": "refs/heads/{{branch}}",
+  "url": "https://api.github.com/repos/acme/pilot/git/refs/heads/{{branch}}",
+  "object": { "type": "commit", "sha": "{{sha}}" }
+}

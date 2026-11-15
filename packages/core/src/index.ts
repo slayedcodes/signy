@@ -6,6 +6,7 @@ export type {
   ValidateOptions,
 } from './validate-contract.js';
 export { runGate } from './gate.js';
+export { prepareApproval, type ApprovalDecision } from './prepare-approval.js';
 export { renderSummary } from './render.js';
 export { buildRunSummary, type RunSummary } from './run-summary.js';
 export { GATE_CONFIG_FILE } from './config.js';

@@ -15,9 +15,14 @@ const fixtureNames = readdirSync(fixturesDir, { withFileTypes: true })
 const readText = (...segments: string[]) => readFileSync(join(fixturesDir, ...segments), 'utf8');
 
 async function gate(fixture: Fixture, repo: FixtureRepo, head: string, comments: GateComment[]) {
+  const commits = await readCommits(repo.dir, repo.base, head);
+  if (fixture.host.verifiesSignatures) {
+    for (const commit of commits) commit.signatureVerified = fixture.commits[repo.shas.indexOf(commit.sha)]?.signatureVerified ?? false;
+  }
   return runGate({
     pr: { ...fixture.pr, base: repo.base, head },
-    commits: await readCommits(repo.dir, repo.base, head),
+    commits,
+    hostVerifiesSignatures: fixture.host.verifiesSignatures ?? false,
     git: createGitReader(repo.dir),
     comments,
     config: fixture.config,

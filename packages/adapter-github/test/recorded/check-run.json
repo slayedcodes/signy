@@ -1,0 +1,8 @@
+{
+  "id": 4242,
+  "head_sha": "{{head}}",
+  "name": "change-contract",
+  "status": "completed",
+  "conclusion": "{{conclusion}}",
+  "html_url": "https://github.com/acme/pilot/runs/4242"
+}

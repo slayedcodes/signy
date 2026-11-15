@@ -153,7 +153,7 @@ Run these checks in order, and collect every failure. Don't stop at the first on
 
 ## 7. GitHub adapter and Action
 
-- **Triggers:** `pull_request` (opened, synchronize, reopened, labeled) and `issue_comment` (created, edited).
+- **Triggers:** `pull_request_target` (opened, synchronize, reopened, labeled, unlabeled), never `pull_request` (ADR 0005), and `issue_comment` (created, edited).
 - **On `/contract approve`:**
   1. Validate it via core.
   2. Push the empty Approval Commit as the bot.
@@ -161,7 +161,7 @@ Run these checks in order, and collect every failure. Don't stop at the first on
   4. Make sure this can't loop.
 - Report results as a check run named `change-contract`, and keep one PR comment updated in place with the summary.
 - Get commenter permission from the collaborator permission API. Detect bots by account type.
-- Verify approval ordering with host data: a verified bot signature on the Approval Commit, and an approval comment older than every later code push (ADR 0003).
+- Verify approval ordering with host data: GitHub must have verified the Approval Commit's signature, so the bot pushes it through the API. Ancestry then orders the code after it (ADR 0003).
 - Upload `run-summary.json` as a workflow artifact.
 
 ## 8. CLI (`contract`)

@@ -1,0 +1,9 @@
+{
+  "id": {{id}},
+  "html_url": "https://github.com/acme/pilot/pull/7#issuecomment-{{id}}",
+  "body": {{body}},
+  "user": { "login": "{{login}}", "id": 2002, "type": "{{userType}}" },
+  "created_at": "{{createdAt}}",
+  "updated_at": "{{createdAt}}",
+  "author_association": "MEMBER"
+}
