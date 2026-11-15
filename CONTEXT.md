@@ -22,6 +22,10 @@ A Deviation where the change contains something that no Clause allows.
 **Unmet Clause**:
 A Deviation where a Clause promised something the change doesn't contain.
 
+**Test Weakening**:
+A change that makes existing tests check less: deleting a test, removing an assertion, adding `.skip`, `.only` or `.todo`, rewriting an existing snapshot, or loosening a matcher (for example `toEqual` to `toBeTruthy`). It is an Unplanned Change unless a tests Clause declares it.
+_Avoid_: Test regression, test rot
+
 **Contract Approval**:
 A human's recorded agreement to one exact Contract Version, given before any code is written.
 

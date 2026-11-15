@@ -75,7 +75,7 @@ export interface GateFailure {
 export type DeviationKind = 'unplanned-change' | 'unmet-clause';
 
 /** Which check found the Deviation. */
-export type DeviationCheck = 'scope' | 'ci-config' | 'dependencies' | 'must-not-change' | 'interface';
+export type DeviationCheck = 'scope' | 'ci-config' | 'dependencies' | 'must-not-change' | 'interface' | 'tests';
 
 export type SignoffDecision = 'accept' | 'reject';
 

@@ -1,0 +1,27 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>).",
+    "Change Contract .contracts/say-hi.json approved by reviewer in Approval Commit {{short:2}}."
+  ],
+  "failures": [],
+  "deviations": [
+    {
+      "id": "{{id:unplanned-change:tests:src/greet.test.ts > greet says hi}}",
+      "fingerprint": "{{fingerprint:unplanned-change:tests:src/greet.test.ts > greet says hi}}",
+      "kind": "unplanned-change",
+      "check": "tests",
+      "target": "src/greet.test.ts > greet says hi",
+      "detail": "src/greet.test.ts > greet says hi is weakened: snapshot `greet says hi 1` in src/__snapshots__/greet.test.ts.snap rewritten. No tests Clause declares modifying it.",
+      "status": "unsigned"
+    }
+  ],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
+}

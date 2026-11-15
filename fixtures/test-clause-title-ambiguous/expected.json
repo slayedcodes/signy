@@ -1,0 +1,45 @@
+{
+  "status": "fail",
+  "applicable": true,
+  "notes": [
+    "Agent-authored PR: commit {{short:1}} has a Co-Authored-By trailer naming a known agent (Claude Opus 5.5 <noreply@anthropic.com>).",
+    "Change Contract .contracts/say-hi.json approved by reviewer in Approval Commit {{short:2}}."
+  ],
+  "failures": [],
+  "deviations": [
+    {
+      "id": "{{id:unplanned-change:tests:src/greet.test.ts > en works}}",
+      "fingerprint": "{{fingerprint:unplanned-change:tests:src/greet.test.ts > en works}}",
+      "kind": "unplanned-change",
+      "check": "tests",
+      "target": "src/greet.test.ts > en works",
+      "detail": "src/greet.test.ts > en works is deleted, but no tests Clause declares removing it.",
+      "status": "unsigned"
+    },
+    {
+      "id": "{{id:unplanned-change:tests:src/greet.test.ts > fr works}}",
+      "fingerprint": "{{fingerprint:unplanned-change:tests:src/greet.test.ts > fr works}}",
+      "kind": "unplanned-change",
+      "check": "tests",
+      "target": "src/greet.test.ts > fr works",
+      "detail": "src/greet.test.ts > fr works is deleted, but no tests Clause declares removing it.",
+      "status": "unsigned"
+    },
+    {
+      "id": "{{id:unmet-clause:tests:src/greet.test.ts > works}}",
+      "fingerprint": "{{fingerprint:unmet-clause:tests:src/greet.test.ts > works}}",
+      "kind": "unmet-clause",
+      "check": "tests",
+      "target": "src/greet.test.ts > works",
+      "detail": "The Change Contract declares removing the test src/greet.test.ts > works, but the change doesn't. The name matches more than one test; name it in full.",
+      "status": "unsigned"
+    }
+  ],
+  "commandErrors": [],
+  "approval": {
+    "by": "reviewer",
+    "commit": "{{sha:2}}",
+    "commentUrl": "https://code.example/pr/1#comment-1",
+    "approvedAt": "2023-11-14T22:15:00Z"
+  }
+}

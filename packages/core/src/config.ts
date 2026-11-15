@@ -29,7 +29,7 @@ export interface GateConfig {
   signoffPolicy?: SignoffPolicyConfig;
   /** Globs for CI and config files; changing one outside the scope is a ci-config Deviation. */
   ciConfigFiles?: string[];
-  /** Globs for test files. Symbol-level checks skip them; test Clauses cover them (milestone 5). */
+  /** Globs for test files. Their exports are not public interface; their tests are checked for Test Weakening. */
   testFiles?: string[];
   /** The gate bot's git identity. Read by the CLI and host adapters to fill `GateInput.bot`. */
   bot?: BotIdentity;

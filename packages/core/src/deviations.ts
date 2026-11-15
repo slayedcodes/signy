@@ -18,9 +18,9 @@ import {
   symbolFindings,
   type InterfaceChange,
 } from './symbol-deviations.js';
+import { isSnapshotFile, snapshotTestFile, testFindings, type FileVersions } from './test-deviations.js';
 import type { Deviation, FileChange, GateInput } from './types.js';
 import type { ChangeContract } from './validate-contract.js';
-
 
 /** Step 4 of the gate: compare the change (head vs its merge-base) with the Change Contract. */
 export async function detectDeviations(
@@ -35,6 +35,8 @@ export async function detectDeviations(
   const dependencyChanges: DependencyChange[] = [];
   const lockfileFindings: Finding[] = [];
   const interfaceChanges: InterfaceChange[] = [];
+  const testFiles: FileVersions[] = [];
+  const snapshotFiles: FileVersions[] = [];
 
   for (const change of changes) {
     const before = await input.git.readFile(mergeBase, change.path);
@@ -63,20 +65,31 @@ export async function detectDeviations(
     }
     const outOfScope = scopeFinding(change, contract, config);
     if (outOfScope) fileFindings.push({ ...outOfScope, content });
+    if (isSnapshotFile(change.path)) snapshotFiles.push({ path: change.path, before, after });
     if (!isSourceFile(change.path)) {
       fileFindings.push(...nonSourceFindings(change, contract, !outOfScope, content));
       continue;
     }
     const symbols = symbolFindings(change, before, after, contract, !outOfScope);
     fileFindings.push(...symbols.findings);
-    // A test module's exports aren't public interface. An out-of-scope file is already one
-    // whole-file Deviation: its interface changes count towards meeting interface Clauses,
-    // but aren't reported a second time.
-    if (!config.testFiles.some((glob) => matchesGlob(change.path, glob))) {
+    if (config.testFiles.some((glob) => matchesGlob(change.path, glob))) {
+      // A test module's exports aren't public interface, but its tests are checked for
+      // weakening, in scope or not: only a tests Clause excuses it.
+      testFiles.push({ path: change.path, before, after });
+    } else {
+      // An out-of-scope file is already one whole-file Deviation: its interface changes count
+      // towards meeting interface Clauses, but aren't reported a second time.
       interfaceChanges.push(...symbols.interfaceChanges.map((c) => ({ ...c, coveredByFile: Boolean(outOfScope) })));
     }
   }
   const interfaceResult = interfaceFindings(contract.interface ?? [], interfaceChanges);
+  // Snapshot entries are tied to their tests, so every snapshot's test file is read, changed or not.
+  for (const path of new Set(snapshotFiles.map((s) => snapshotTestFile(s.path)))) {
+    if (testFiles.some((t) => t.path === path)) continue;
+    const text = await input.git.readFile(input.pr.head, path);
+    testFiles.push({ path, before: text, after: text });
+  }
+  const testResult = testFindings(testFiles, snapshotFiles, contract.tests ?? []);
 
   const clauses = contract.dependencies ?? [];
   const dependencyFindings: Finding[] = dependencyChanges
@@ -106,8 +119,10 @@ export async function detectDeviations(
     ...interfaceResult.unplanned,
     ...dependencyFindings,
     ...(lockfilesExplained ? [] : lockfileFindings),
+    ...testResult.unplanned,
     ...interfaceResult.unmet,
     ...unmetFindings,
+    ...testResult.unmet,
   ].map(toDeviation);
 }
 
