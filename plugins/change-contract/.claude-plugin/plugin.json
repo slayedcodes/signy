@@ -1,0 +1,8 @@
+{
+  "name": "change-contract",
+  "description": "Work on Change Contract-gated PRs: draft the contract, stop for approval, code within it, self-check, rework from feedback.",
+  "version": "0.1.0",
+  "author": { "name": "slayedcodes" },
+  "repository": "https://github.com/slayedcodes/signy",
+  "license": "UNLICENSED"
+}

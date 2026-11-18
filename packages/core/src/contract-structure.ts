@@ -18,7 +18,8 @@ export interface StructureCheck {
   failures: GateFailure[];
 }
 
-const isContractFile = (path: string) => /^\.contracts\/[^/]+\.json$/.test(path);
+/** A Change Contract's path: `.contracts/<slug>.json`. */
+export const isContractFile = (path: string): boolean => /^\.contracts\/[^/]+\.json$/.test(path);
 const isAddedContract = (f: FileChange) => f.status === 'added' && isContractFile(f.path);
 const CHANGE_VERB = { added: 'adds', deleted: 'deletes', modified: 'edits' } as const;
 

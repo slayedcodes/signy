@@ -1,0 +1,6 @@
+{
+  "sha": "{{sha}}",
+  "commit": { "message": "…" },
+  "parents": [],
+  "files": [{{files}}]
+}

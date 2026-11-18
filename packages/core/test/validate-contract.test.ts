@@ -4,7 +4,7 @@ import { validateContract } from '../src/index.js';
 /** The example Change Contract from PLAN.md §4. */
 function exampleContract(): Record<string, any> {
   return {
-    $schema: 'https://unpkg.com/@change-contract/core/schema/change-contract.schema.json',
+    $schema: 'https://raw.githubusercontent.com/slayedcodes/signy/main/schema/change-contract.schema.json',
     version: 1,
     slug: 'add-retry-to-billing-client',
     issue: 'https://example.com/issues/42',

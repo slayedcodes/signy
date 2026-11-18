@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import type { GitAccess } from '@change-contract/adapter-github';
 import type { FileChange, FileChangeStatus, GateCommit, GitReader } from '@change-contract/core';
 
 const run = promisify(execFile);
@@ -86,4 +87,29 @@ function parseNameStatus(out: string): FileChange[] {
     changes.push({ path: fields[i + 1]!, status: STATUS[fields[i]![0] ?? ''] ?? 'modified' });
   }
   return changes;
+}
+
+/**
+ * Git for the GitHub adapter: a reader over the local checkout that can fetch a PR's commits.
+ * Missing commits are fetched through `refs/pull/N/head`, which covers branches in forks too,
+ * then by SHA (e.g. an Approval Commit the gate just created).
+ */
+export function createGitAccess(dir: string): GitAccess {
+  const isPresent = (sha: string) => git(dir, ['cat-file', '-e', `${sha}^{commit}`]).then(() => true, () => false);
+  return {
+    reader: createGitReader(dir),
+    readCommits: (base, head) => readCommits(dir, base, head),
+    async fetchCommits(shas, pull) {
+      if ((await Promise.all(shas.map(isPresent))).every(Boolean)) return;
+      await git(dir, [
+        'fetch', '--no-tags', '--quiet', 'origin',
+        `+refs/pull/${pull.number}/head:refs/remotes/change-contract/pr-${pull.number}`,
+        `+refs/heads/${pull.baseRef}:refs/remotes/change-contract/base`,
+      ]);
+      const missing = (await Promise.all(shas.map(async (sha) => ((await isPresent(sha)) ? undefined : sha)))).filter(
+        (sha): sha is string => sha !== undefined,
+      );
+      if (missing.length > 0) await git(dir, ['fetch', '--no-tags', '--quiet', 'origin', ...missing]);
+    },
+  };
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://unpkg.com/@change-contract/core/schema/change-contract.schema.json",
+  "$id": "https://raw.githubusercontent.com/slayedcodes/signy/main/schema/change-contract.schema.json",
   "title": "Change Contract",
   "description": "A typed, machine-checkable statement of what one PR will and won't change. It is approved by a human before any code is written.",
   "type": "object",

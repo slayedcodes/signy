@@ -211,7 +211,8 @@ Each milestone ends with green tests and a short demo note in `docs/demos/`.
 5. **Tests clauses and test weakening.**
 6. **GitHub adapter and Action.** Check run, summary comment, Approval Commit push, permissions, run summary artifact. Demo it on a sandbox repo.
 7. **CLI `init`, `approve`, `feedback`, plus the Claude Code plugin and skill.** Install the plugin through the marketplace in a clean environment and do one full PR cycle.
-8. **Pilot hardening.** Run against 20 historical agent PRs from the pilot repo in `check` mode, tune the contract lint, and write the pilot README with the metrics from §5.7.
+8. **The gate's own GitHub App identity.** Close the look-alike check gap (ADR 0005): a ready-made workflow that runs the gate with a dedicated GitHub App token (`actions/create-github-app-token`), a setup guide for creating and installing the app, pinning the required `change-contract` check to that app, and setting the app's bot identity in `.change-contract.json`. Demo it on the sandbox: a PR adding a fake `change-contract` job can't satisfy branch protection.
+9. **Pilot hardening.** Run against 20 historical agent PRs from the pilot repo in `check` mode, tune the contract lint, and write the pilot README with the metrics from §5.7.
 
 ## 12. Out of scope for v1
 

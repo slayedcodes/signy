@@ -1,11 +1,7 @@
 #!/usr/bin/env node
-// Runs the TypeScript source directly until the CLI is bundled for distribution.
+// Runs the TypeScript source directly; the plugin ships a bundled copy (plugins/change-contract/bin).
 import { register } from 'tsx/esm/api';
 
 register();
-const { main } = await import('../src/main.ts');
-process.exitCode = await main(process.argv.slice(2), {
-  cwd: process.cwd(),
-  stdout: (text) => process.stdout.write(text),
-  stderr: (text) => process.stderr.write(text),
-});
+const { run } = await import('../src/run.ts');
+await run();

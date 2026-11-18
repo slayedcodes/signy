@@ -66,6 +66,15 @@ export function fakeGitHub(state: FakeState) {
       createdAt: c.createdAt,
     });
 
+  const pullValues = () => ({
+    prAuthor: state.prAuthor,
+    labels: (state.labels ?? []).map((l) => str({ name: l })).join(','),
+    branch: state.branch ?? 'claude/say-hi',
+    headRepo: state.headRepo ?? 'acme/pilot',
+    head: state.head,
+    base: state.base,
+  });
+
   const git = async (args: string[], env: Record<string, string> = {}) =>
     (await run('git', args, { cwd: state.repoDir, env: { ...process.env, ...env } })).stdout.trim();
 
@@ -79,15 +88,23 @@ export function fakeGitHub(state: FakeState) {
       const nodes = state.comments.map((c) => str({ databaseId: c.id, editor: c.editor ? actor(c.editor) : null }));
       return [200, fill('graphql-comment-editors', { nodes: nodes.join(',') })];
     }
+    if (route === 'GET /repos/acme/pilot/pulls') {
+      // Open PRs for `head=acme:<branch>`: PR #7 when the branch matches.
+      const branch = state.branch ?? 'claude/say-hi';
+      return [200, query.get('head') === `acme:${branch}` ? [fill('pull', pullValues())] : []];
+    }
+    if ((m = /^GET \/repos\/acme\/pilot\/contents\/(.+)$/.exec(route))) {
+      const path = decodeURIComponent(m[1]!);
+      const ref = query.get('ref') ?? state.head;
+      const content = await git(['show', `${ref}:${path}`]).catch(() => undefined);
+      if (content === undefined) return [404, { message: 'Not Found' }];
+      // GitHub base64-encodes file content in 60-character lines; git's trailing newline matters for the hash.
+      const raw = (await run('git', ['show', `${ref}:${path}`], { cwd: state.repoDir })).stdout;
+      const base64 = Buffer.from(raw, 'utf8').toString('base64').replace(/(.{60})/g, '$1\n');
+      return [200, fill('contents', { path, content: str(base64) })];
+    }
     if (route === 'GET /repos/acme/pilot/pulls/7') {
-      return [200, fill('pull', {
-        prAuthor: state.prAuthor,
-        labels: (state.labels ?? []).map((l) => str({ name: l })).join(','),
-        branch: state.branch ?? 'claude/say-hi',
-        headRepo: state.headRepo ?? 'acme/pilot',
-        head: state.head,
-        base: state.base,
-      })];
+      return [200, fill('pull', pullValues())];
     }
     if (route === 'GET /repos/acme/pilot/pulls/7/commits') {
       if (query.get('page') !== '1') return [200, []];
@@ -119,6 +136,16 @@ export function fakeGitHub(state: FakeState) {
       if (!existing) return [404, { message: 'Not Found' }];
       existing.body = body.body;
       return [200, comment(existing)];
+    }
+    if ((m = /^GET \/repos\/acme\/pilot\/commits\/([0-9a-f]+)$/.exec(route))) {
+      const sha = m[1]!;
+      const lines = (await git(['show', '--no-renames', '--name-status', '--format=', sha])).split('\n').filter(Boolean);
+      const status = { A: 'added', M: 'modified', D: 'removed' } as Record<string, string>;
+      const files = lines.map((line) => {
+        const [code, filename] = line.split('\t');
+        return str({ filename, status: status[code!] ?? 'modified' });
+      });
+      return [200, fill('commit', { sha, files: files.join(',') })];
     }
     if ((m = /^GET \/repos\/acme\/pilot\/git\/commits\/([0-9a-f]+)$/.exec(route))) {
       const sha = m[1]!;

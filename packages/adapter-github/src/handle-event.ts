@@ -70,10 +70,9 @@ export async function handleEvent(event: GitHubEvent, deps: AdapterDeps): Promis
   }
 
   const api = new GitHubApi(deps);
-  const pull = await api.pull(number);
-  await deps.git.fetchCommits([pull.baseSha, pull.headSha], pull);
-  const comments = await api.comments(number);
-  let input = await gateInput(api, deps, pull, comments, pull.headSha);
+  const loaded = await loadPullRequest(api, deps.git, number);
+  const { pull, comments } = loaded;
+  let input = loaded.input;
   const triggerIndex = event.name === 'issue_comment' ? comments.findIndex((c) => c.id === event.payload.comment?.id) : -1;
   const trigger = input.comments[triggerIndex];
 
@@ -86,6 +85,21 @@ export async function handleEvent(event: GitHubEvent, deps: AdapterDeps): Promis
     prId: `${deps.repo}#${number}`,
   });
   return { handled: true, head: input.pr.head, result, runSummary };
+}
+
+/**
+ * Everything the gate needs about one PR: the PR and its comments from GitHub, its commits
+ * from git (fetched if missing), and the gate input for its current head.
+ */
+export async function loadPullRequest(
+  api: GitHubApi,
+  git: GitAccess,
+  number: number,
+): Promise<{ pull: PullRequest; comments: IssueComment[]; input: GateInput }> {
+  const pull = await api.pull(number);
+  await git.fetchCommits([pull.baseSha, pull.headSha], pull);
+  const comments = await api.comments(number);
+  return { pull, comments, input: await gateInput(api, git, pull, comments, pull.headSha) };
 }
 
 function pullNumber(event: GitHubEvent): number | undefined {
@@ -134,7 +148,7 @@ async function recordApproval(
     }
     await deps.git.fetchCommits([approval.sha], pull);
     // Pushes made with GITHUB_TOKEN start no workflow, so the gate runs on the new head right here.
-    return gateInput(api, deps, pull, comments, approval.sha, approval.verified ? [approval.sha] : []);
+    return gateInput(api, deps.git, pull, comments, approval.sha, approval.verified ? [approval.sha] : []);
   }
   return input;
 }
@@ -161,7 +175,7 @@ function reply(comment: GateComment, lines: string[], message: string): string {
 
 async function gateInput(
   api: GitHubApi,
-  deps: AdapterDeps,
+  git: GitAccess,
   pull: PullRequest,
   comments: IssueComment[],
   head: string,
@@ -169,9 +183,9 @@ async function gateInput(
   alsoVerified: string[] = [],
 ): Promise<GateInput> {
   // The gate config comes from the base branch, so a PR can't loosen the rules it is checked by.
-  const configText = await deps.git.reader.readFile(pull.baseSha, GATE_CONFIG_FILE);
+  const configText = await git.reader.readFile(pull.baseSha, GATE_CONFIG_FILE);
   const config = (configText ? JSON.parse(configText) : {}) as GateConfig;
-  const [commits, verified] = await Promise.all([deps.git.readCommits(pull.baseSha, head), api.verifiedCommits(pull.number)]);
+  const [commits, verified] = await Promise.all([git.readCommits(pull.baseSha, head), api.verifiedCommits(pull.number)]);
   alsoVerified.forEach((sha) => verified.add(sha));
   const gateComments: GateComment[] = await Promise.all(
     comments.map(async (c) => ({
@@ -186,7 +200,7 @@ async function gateInput(
   return {
     pr: { author: pull.author, labels: pull.labels, branch: pull.headRef, base: pull.baseSha, head },
     commits: commits.map((c) => ({ ...c, signatureVerified: verified.has(c.sha) })),
-    git: deps.git.reader,
+    git: git.reader,
     comments: gateComments,
     config,
     bot: config.bot ?? GITHUB_ACTIONS_BOT,

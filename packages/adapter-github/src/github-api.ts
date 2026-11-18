@@ -90,17 +90,32 @@ export class GitHubApi {
   }
 
   async pull(number: number): Promise<PullRequest> {
-    const pr = await this.request<any>('GET', `/pulls/${number}`);
-    return {
-      number: pr.number,
-      author: pr.user.login,
-      labels: pr.labels.map((l: { name: string }) => l.name),
-      headRef: pr.head.ref,
-      headSha: pr.head.sha,
-      headRepo: pr.head.repo?.full_name ?? '',
-      baseRef: pr.base.ref,
-      baseSha: pr.base.sha,
-    };
+    return toPullRequest(await this.request<any>('GET', `/pulls/${number}`));
+  }
+
+  /** The open PR whose head is `branch` in this repository, if any. */
+  async openPullForBranch(branch: string): Promise<PullRequest | undefined> {
+    const owner = this.options.repo.split('/')[0];
+    const pulls = await this.request<any[]>('GET', `/pulls?state=open&head=${encodeURIComponent(`${owner}:${branch}`)}`);
+    return pulls[0] ? toPullRequest(pulls[0]) : undefined;
+  }
+
+  /** A file's content at `ref`, decoded as UTF-8. */
+  async fileContent(path: string, ref: string): Promise<string> {
+    const encoded = path.split('/').map(encodeURIComponent).join('/');
+    const file = await this.request<any>('GET', `/contents/${encoded}?ref=${encodeURIComponent(ref)}`);
+    return Buffer.from(file.content, 'base64').toString('utf8');
+  }
+
+  /** The PR's commit SHAs, oldest first. GitHub lists at most 250 commits. */
+  async pullCommitShas(number: number): Promise<string[]> {
+    return (await this.all<any>(`/pulls/${number}/commits`)).map((c) => c.sha as string);
+  }
+
+  /** The files one commit changes. */
+  async commitFiles(sha: string): Promise<Array<{ path: string; status: string }>> {
+    const commit = await this.request<any>('GET', `/commits/${sha}`);
+    return (commit.files ?? []).map((f: any) => ({ path: f.filename, status: f.status }));
   }
 
   /** SHAs of the PR's commits whose signature GitHub verified. GitHub lists at most 250 commits. */
@@ -195,8 +210,9 @@ export class GitHubApi {
     });
   }
 
-  async createComment(number: number, body: string): Promise<void> {
-    await this.request('POST', `/issues/${number}/comments`, { body });
+  /** Posts a comment and returns its URL. */
+  async createComment(number: number, body: string): Promise<string> {
+    return (await this.request<any>('POST', `/issues/${number}/comments`, { body })).html_url;
   }
 
   async updateComment(id: number, body: string): Promise<void> {
@@ -221,4 +237,17 @@ export class GitHubApi {
     const path = branch.split('/').map(encodeURIComponent).join('/');
     await this.request('PATCH', `/git/refs/heads/${path}`, { sha, force: false });
   }
+}
+
+function toPullRequest(pr: any): PullRequest {
+  return {
+    number: pr.number,
+    author: pr.user.login,
+    labels: pr.labels.map((l: { name: string }) => l.name),
+    headRef: pr.head.ref,
+    headSha: pr.head.sha,
+    headRepo: pr.head.repo?.full_name ?? '',
+    baseRef: pr.base.ref,
+    baseSha: pr.base.sha,
+  };
 }

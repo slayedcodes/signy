@@ -1,12 +1,24 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { validateContract } from '@change-contract/core';
+import type { Fetch } from '@change-contract/adapter-github';
+import { approve } from './approve.js';
+import { feedback } from './feedback.js';
 import { check } from './check.js';
+import { init } from './init.js';
 
 export interface Io {
   cwd: string;
   stdout: (text: string) => void;
   stderr: (text: string) => void;
+  /** Asks a question on the terminal; absent when there is no terminal to ask on. */
+  prompt?: (question: string) => Promise<string>;
+  /** Environment variables (GITHUB_TOKEN, GH_TOKEN, GITHUB_API_URL). */
+  env?: Record<string, string | undefined>;
+  /** HTTP for the GitHub commands; tests replay recorded responses. */
+  fetch?: Fetch;
+  /** `gh auth token`, the token fallback; tests replace it. */
+  ghToken?: () => Promise<string | undefined>;
 }
 
 const CONTRACTS_DIR = '.contracts';
@@ -16,7 +28,10 @@ export async function main(args: string[], io: Io): Promise<number> {
   const [command, ...rest] = args;
   if (command === 'validate') return validate(rest, io);
   if (command === 'check') return check(rest, io);
-  io.stderr(`Unknown command: ${command ?? '(none)'}\nUsage: contract validate [file] | contract check --base <ref>\n`);
+  if (command === 'init') return init(rest, io);
+  if (command === 'approve') return approve(rest, io);
+  if (command === 'feedback') return feedback(rest, io);
+  io.stderr(`Unknown command: ${command ?? '(none)'}\nUsage: contract init | validate | check | approve | feedback\n`);
   return 2;
 }
 

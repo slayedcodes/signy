@@ -10,7 +10,14 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@change-contract/adapter-github": "workspace:*",
     "@change-contract/core": "workspace:*",
     "tsx": "^4.23.15"
+  },
+  "scripts": {
+    "build:plugin": "node build-plugin.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "change-contract",
+  "owner": { "name": "slayedcodes" },
+  "metadata": {
+    "description": "The Change Contract gate: agent-authored PRs are reviewed against a contract a human approved before any code was written."
+  },
+  "plugins": [
+    {
+      "name": "change-contract",
+      "source": "./plugins/change-contract",
+      "description": "Work on Change Contract-gated PRs: draft the contract, stop for approval, code within it, self-check, rework from feedback.",
+      "version": "0.1.0"
+    }
+  ]
+}

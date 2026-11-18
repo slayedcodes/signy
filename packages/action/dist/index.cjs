@@ -10918,11 +10918,11 @@ var require_typescript = __commonJS({
       function compareTextSpans(a, b) {
         return compareValues(a == null ? void 0 : a.start, b == null ? void 0 : b.start) || compareValues(a == null ? void 0 : a.length, b == null ? void 0 : b.length);
       }
-      function maxBy(arr, init, mapper) {
+      function maxBy(arr, init2, mapper) {
         for (let i = 0; i < arr.length; i++) {
-          init = Math.max(init, mapper(arr[i]));
+          init2 = Math.max(init2, mapper(arr[i]));
         }
-        return init;
+        return init2;
       }
       function min(items, compare) {
         return reduceLeft(items, (x, y) => compare(x, y) === -1 ? x : y);
@@ -26550,8 +26550,8 @@ ${lanes.join("\n")}
         return node.initializer;
       }
       function getDeclaredExpandoInitializer(node) {
-        const init = getEffectiveInitializer(node);
-        return init && getExpandoInitializer(init, isPrototypeAccess(node.name));
+        const init2 = getEffectiveInitializer(node);
+        return init2 && getExpandoInitializer(init2, isPrototypeAccess(node.name));
       }
       function hasExpandoValueProperty(node, isPrototypeAssignment) {
         return forEach(node.properties, (p) => isPropertyAssignment(p) && isIdentifier(p.name) && p.name.escapedText === "value" && p.initializer && getExpandoInitializer(p.initializer, isPrototypeAssignment));
@@ -60360,11 +60360,11 @@ ${lanes.join("\n")}
           if (node && isCallExpression(node)) {
             return !!getAssignedExpandoInitializer(node);
           }
-          let init = !node ? void 0 : isVariableDeclaration(node) ? node.initializer : isBinaryExpression(node) ? node.right : isPropertyAccessExpression(node) && isBinaryExpression(node.parent) ? node.parent.right : void 0;
-          init = init && getRightMostAssignedExpression(init);
-          if (init) {
+          let init2 = !node ? void 0 : isVariableDeclaration(node) ? node.initializer : isBinaryExpression(node) ? node.right : isPropertyAccessExpression(node) && isBinaryExpression(node.parent) ? node.parent.right : void 0;
+          init2 = init2 && getRightMostAssignedExpression(init2);
+          if (init2) {
             const isPrototypeAssignment = isPrototypeAccess(isVariableDeclaration(node) ? node.name : isBinaryExpression(node) ? node.left : node);
-            return !!getExpandoInitializer(isBinaryExpression(init) && (init.operatorToken.kind === 57 || init.operatorToken.kind === 61) ? init.right : init, isPrototypeAssignment);
+            return !!getExpandoInitializer(isBinaryExpression(init2) && (init2.operatorToken.kind === 57 || init2.operatorToken.kind === 61) ? init2.right : init2, isPrototypeAssignment);
           }
           return false;
         }
@@ -60683,15 +60683,15 @@ ${lanes.join("\n")}
           } else if (isIdentifier(node)) {
             const symbol = lookupSymbolForName(sourceFile, node.escapedText);
             if (!!symbol && !!symbol.valueDeclaration && isVariableDeclaration(symbol.valueDeclaration) && !!symbol.valueDeclaration.initializer) {
-              const init = symbol.valueDeclaration.initializer;
-              q.enqueue(init);
+              const init2 = symbol.valueDeclaration.initializer;
+              q.enqueue(init2);
               if (isAssignmentExpression(
-                init,
+                init2,
                 /*excludeCompoundAssignment*/
                 true
               )) {
-                q.enqueue(init.left);
-                q.enqueue(init.right);
+                q.enqueue(init2.left);
+                q.enqueue(init2.right);
               }
             }
           }
@@ -65333,9 +65333,9 @@ ${lanes.join("\n")}
           )) {
             return void 0;
           }
-          const init = isVariableDeclaration(decl) ? getDeclaredExpandoInitializer(decl) : getAssignedExpandoInitializer(decl);
-          if (init) {
-            const initSymbol = getSymbolOfNode(init);
+          const init2 = isVariableDeclaration(decl) ? getDeclaredExpandoInitializer(decl) : getAssignedExpandoInitializer(decl);
+          if (init2) {
+            const initSymbol = getSymbolOfNode(init2);
             if (initSymbol) {
               return mergeJSSymbols(initSymbol, symbol);
             }
@@ -72740,9 +72740,9 @@ ${lanes.join("\n")}
           }
           return widened;
         }
-        function getJSContainerObjectType(decl, symbol, init) {
+        function getJSContainerObjectType(decl, symbol, init2) {
           var _a, _b;
-          if (!isInJSFile(decl) || !init || !isObjectLiteralExpression(init) || init.properties.length) {
+          if (!isInJSFile(decl) || !init2 || !isObjectLiteralExpression(init2) || init2.properties.length) {
             return void 0;
           }
           const exports22 = createSymbolTable();
@@ -87752,8 +87752,8 @@ ${lanes.join("\n")}
                 return unreachableNeverType;
               }
               if (isVariableDeclaration(node) && (isInJSFile(node) || isVarConstLike2(node))) {
-                const init = getDeclaredExpandoInitializer(node);
-                if (init && (init.kind === 219 || init.kind === 220)) {
+                const init2 = getDeclaredExpandoInitializer(node);
+                if (init2 && (init2.kind === 219 || init2.kind === 220)) {
                   return getTypeAtFlowNode(flow.antecedent);
                 }
               }
@@ -95386,8 +95386,8 @@ ${lanes.join("\n")}
             true
           );
           const prototype = (_a = assignmentSymbol == null ? void 0 : assignmentSymbol.exports) == null ? void 0 : _a.get("prototype");
-          const init = (prototype == null ? void 0 : prototype.valueDeclaration) && getAssignedJSPrototype(prototype.valueDeclaration);
-          return init ? getSymbolOfDeclaration(init) : void 0;
+          const init2 = (prototype == null ? void 0 : prototype.valueDeclaration) && getAssignedJSPrototype(prototype.valueDeclaration);
+          return init2 ? getSymbolOfDeclaration(init2) : void 0;
         }
         function getSymbolOfExpando(node, allowDeclaration) {
           if (!node.parent) {
@@ -98455,8 +98455,8 @@ ${lanes.join("\n")}
               case 3:
               case 4:
                 const symbol = getSymbolOfNode(left);
-                const init = getAssignedExpandoInitializer(right);
-                return !!init && isObjectLiteralExpression(init) && !!((_a = symbol == null ? void 0 : symbol.exports) == null ? void 0 : _a.size);
+                const init2 = getAssignedExpandoInitializer(right);
+                return !!init2 && isObjectLiteralExpression(init2) && !!((_a = symbol == null ? void 0 : symbol.exports) == null ? void 0 : _a.size);
               default:
                 return false;
             }
@@ -162411,13 +162411,13 @@ ${lanes.join("\n")}
             }
           } else {
             if (isVariableStatement(node) && node.parent === sourceFile && node.declarationList.flags & 2 && node.declarationList.declarations.length === 1) {
-              const init = node.declarationList.declarations[0].initializer;
-              if (init && isRequireCall(
-                init,
+              const init2 = node.declarationList.declarations[0].initializer;
+              if (init2 && isRequireCall(
+                init2,
                 /*requireStringLiteralLikeArgument*/
                 true
               )) {
-                diags.push(createDiagnosticForNode(init, Diagnostics.require_call_may_be_converted_to_an_import));
+                diags.push(createDiagnosticForNode(init2, Diagnostics.require_call_may_be_converted_to_an_import));
               }
             }
             const jsdocTypedefNodes = ts_codefix_exports.getJSDocTypedefNodes(node);
@@ -175331,7 +175331,7 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
           factory.createIdentifier(name)
         );
       }
-      function makeConst(modifiers, name, init) {
+      function makeConst(modifiers, name, init2) {
         return factory.createVariableStatement(
           modifiers,
           factory.createVariableDeclarationList(
@@ -175341,7 +175341,7 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
               void 0,
               /*type*/
               void 0,
-              init
+              init2
             )],
             2
             /* Const */
@@ -194364,9 +194364,9 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
             return isFunctionLike(be.right) ? { commentOwner, parameters: be.right.parameters, hasReturn: hasReturn(be.right, options) } : { commentOwner };
           }
           case 173:
-            const init = commentOwner.initializer;
-            if (init && (isFunctionExpression(init) || isArrowFunction(init))) {
-              return { commentOwner, parameters: init.parameters, hasReturn: hasReturn(init, options) };
+            const init2 = commentOwner.initializer;
+            if (init2 && (isFunctionExpression(init2) || isArrowFunction(init2))) {
+              return { commentOwner, parameters: init2.parameters, hasReturn: hasReturn(init2, options) };
             }
         }
       }
@@ -218247,10 +218247,8 @@ Additional information: BADCLIENT: Bad error code, ${badCode} not found in range
 });
 
 // src/main.ts
-var import_node_child_process2 = require("node:child_process");
 var import_node_fs = require("node:fs");
 var import_node_path = require("node:path");
-var import_node_util2 = require("node:util");
 
 // ../core/src/validate-contract.ts
 var import__ = __toESM(require__(), 1);
@@ -218258,7 +218256,7 @@ var import__ = __toESM(require__(), 1);
 // ../../schema/change-contract.schema.json
 var change_contract_schema_default = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://unpkg.com/@change-contract/core/schema/change-contract.schema.json",
+  $id: "https://raw.githubusercontent.com/slayedcodes/signy/main/schema/change-contract.schema.json",
   title: "Change Contract",
   description: "A typed, machine-checkable statement of what one PR will and won't change. It is approved by a human before any code is written.",
   type: "object",
@@ -218504,9 +218502,9 @@ function parseComment(body) {
     if (line.startsWith("```") || line.startsWith("~~~")) inFence = !inFence;
     const lower = line.toLowerCase();
     if (inFence || !(lower.startsWith("/contract") || lower.startsWith("/signoff"))) continue;
-    const approve = APPROVE.exec(line);
-    if (approve) {
-      parsed.approvals.push(approve[1] ? { hash: approve[1].toLowerCase() } : {});
+    const approve2 = APPROVE.exec(line);
+    if (approve2) {
+      parsed.approvals.push(approve2[1] ? { hash: approve2[1].toLowerCase() } : {});
       continue;
     }
     if (/^\/contract\s+approve\b/i.test(line)) {
@@ -219937,17 +219935,28 @@ var GitHubApi = class {
     }
   }
   async pull(number) {
-    const pr = await this.request("GET", `/pulls/${number}`);
-    return {
-      number: pr.number,
-      author: pr.user.login,
-      labels: pr.labels.map((l) => l.name),
-      headRef: pr.head.ref,
-      headSha: pr.head.sha,
-      headRepo: pr.head.repo?.full_name ?? "",
-      baseRef: pr.base.ref,
-      baseSha: pr.base.sha
-    };
+    return toPullRequest(await this.request("GET", `/pulls/${number}`));
+  }
+  /** The open PR whose head is `branch` in this repository, if any. */
+  async openPullForBranch(branch) {
+    const owner = this.options.repo.split("/")[0];
+    const pulls = await this.request("GET", `/pulls?state=open&head=${encodeURIComponent(`${owner}:${branch}`)}`);
+    return pulls[0] ? toPullRequest(pulls[0]) : void 0;
+  }
+  /** A file's content at `ref`, decoded as UTF-8. */
+  async fileContent(path, ref) {
+    const encoded = path.split("/").map(encodeURIComponent).join("/");
+    const file = await this.request("GET", `/contents/${encoded}?ref=${encodeURIComponent(ref)}`);
+    return Buffer.from(file.content, "base64").toString("utf8");
+  }
+  /** The PR's commit SHAs, oldest first. GitHub lists at most 250 commits. */
+  async pullCommitShas(number) {
+    return (await this.all(`/pulls/${number}/commits`)).map((c) => c.sha);
+  }
+  /** The files one commit changes. */
+  async commitFiles(sha) {
+    const commit = await this.request("GET", `/commits/${sha}`);
+    return (commit.files ?? []).map((f) => ({ path: f.filename, status: f.status }));
   }
   /** SHAs of the PR's commits whose signature GitHub verified. GitHub lists at most 250 commits. */
   async verifiedCommits(number) {
@@ -220035,8 +220044,9 @@ var GitHubApi = class {
       output: { title: output.title, summary: output.summary }
     });
   }
+  /** Posts a comment and returns its URL. */
   async createComment(number, body) {
-    await this.request("POST", `/issues/${number}/comments`, { body });
+    return (await this.request("POST", `/issues/${number}/comments`, { body })).html_url;
   }
   async updateComment(id, body) {
     await this.request("PATCH", `/issues/comments/${id}`, { body });
@@ -220058,6 +220068,18 @@ var GitHubApi = class {
     await this.request("PATCH", `/git/refs/heads/${path}`, { sha, force: false });
   }
 };
+function toPullRequest(pr) {
+  return {
+    number: pr.number,
+    author: pr.user.login,
+    labels: pr.labels.map((l) => l.name),
+    headRef: pr.head.ref,
+    headSha: pr.head.sha,
+    headRepo: pr.head.repo?.full_name ?? "",
+    baseRef: pr.base.ref,
+    baseSha: pr.base.sha
+  };
+}
 
 // ../adapter-github/src/handle-event.ts
 var GITHUB_ACTIONS_BOT = {
@@ -220079,10 +220101,9 @@ async function handleEvent(event, deps) {
     return { handled: false, reason: "Comments by bots are ignored." };
   }
   const api = new GitHubApi(deps);
-  const pull = await api.pull(number);
-  await deps.git.fetchCommits([pull.baseSha, pull.headSha], pull);
-  const comments = await api.comments(number);
-  let input2 = await gateInput(api, deps, pull, comments, pull.headSha);
+  const loaded = await loadPullRequest(api, deps.git, number);
+  const { pull, comments } = loaded;
+  let input2 = loaded.input;
   const triggerIndex = event.name === "issue_comment" ? comments.findIndex((c) => c.id === event.payload.comment?.id) : -1;
   const trigger = input2.comments[triggerIndex];
   input2 = await recordApproval(api, deps, pull, comments, input2, trigger);
@@ -220094,6 +220115,12 @@ async function handleEvent(event, deps) {
     prId: `${deps.repo}#${number}`
   });
   return { handled: true, head: input2.pr.head, result, runSummary };
+}
+async function loadPullRequest(api, git2, number) {
+  const pull = await api.pull(number);
+  await git2.fetchCommits([pull.baseSha, pull.headSha], pull);
+  const comments = await api.comments(number);
+  return { pull, comments, input: await gateInput(api, git2, pull, comments, pull.headSha) };
 }
 function pullNumber(event) {
   if (event.name === "pull_request_target") return event.payload.pull_request?.number;
@@ -220125,7 +220152,7 @@ async function recordApproval(api, deps, pull, comments, input2, trigger) {
       return input2;
     }
     await deps.git.fetchCommits([approval.sha], pull);
-    return gateInput(api, deps, pull, comments, approval.sha, approval.verified ? [approval.sha] : []);
+    return gateInput(api, deps.git, pull, comments, approval.sha, approval.verified ? [approval.sha] : []);
   }
   return input2;
 }
@@ -220147,10 +220174,10 @@ function reply(comment, lines, message) {
 
 @${comment.author} ${message}`;
 }
-async function gateInput(api, deps, pull, comments, head, alsoVerified = []) {
-  const configText = await deps.git.reader.readFile(pull.baseSha, GATE_CONFIG_FILE);
+async function gateInput(api, git2, pull, comments, head, alsoVerified = []) {
+  const configText = await git2.reader.readFile(pull.baseSha, GATE_CONFIG_FILE);
   const config = configText ? JSON.parse(configText) : {};
-  const [commits, verified] = await Promise.all([deps.git.readCommits(pull.baseSha, head), api.verifiedCommits(pull.number)]);
+  const [commits, verified] = await Promise.all([git2.readCommits(pull.baseSha, head), api.verifiedCommits(pull.number)]);
   alsoVerified.forEach((sha) => verified.add(sha));
   const gateComments = await Promise.all(
     comments.map(async (c) => ({
@@ -220165,7 +220192,7 @@ async function gateInput(api, deps, pull, comments, head, alsoVerified = []) {
   return {
     pr: { author: pull.author, labels: pull.labels, branch: pull.headRef, base: pull.baseSha, head },
     commits: commits.map((c) => ({ ...c, signatureVerified: verified.has(c.sha) })),
-    git: deps.git.reader,
+    git: git2.reader,
     comments: gateComments,
     config,
     bot: config.bot ?? GITHUB_ACTIONS_BOT,
@@ -220187,12 +220214,17 @@ ${summary}`;
   else if (result.applicable) await api.createComment(pull.number, body);
 }
 
-// ../cli/src/git.ts
+// ../cli/src/github.ts
 var import_node_child_process = require("node:child_process");
 var import_node_util = require("node:util");
 var run = (0, import_node_util.promisify)(import_node_child_process.execFile);
+
+// ../cli/src/git.ts
+var import_node_child_process2 = require("node:child_process");
+var import_node_util2 = require("node:util");
+var run2 = (0, import_node_util2.promisify)(import_node_child_process2.execFile);
 async function git(dir, args) {
-  const { stdout } = await run("git", args, { cwd: dir, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const { stdout } = await run2("git", args, { cwd: dir, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   return stdout;
 }
 function createGitReader(dir) {
@@ -220243,23 +220275,35 @@ function parseNameStatus(out) {
   }
   return changes;
 }
+function createGitAccess(dir) {
+  const isPresent = (sha) => git(dir, ["cat-file", "-e", `${sha}^{commit}`]).then(() => true, () => false);
+  return {
+    reader: createGitReader(dir),
+    readCommits: (base, head) => readCommits(dir, base, head),
+    async fetchCommits(shas, pull) {
+      if ((await Promise.all(shas.map(isPresent))).every(Boolean)) return;
+      await git(dir, [
+        "fetch",
+        "--no-tags",
+        "--quiet",
+        "origin",
+        `+refs/pull/${pull.number}/head:refs/remotes/change-contract/pr-${pull.number}`,
+        `+refs/heads/${pull.baseRef}:refs/remotes/change-contract/base`
+      ]);
+      const missing = (await Promise.all(shas.map(async (sha) => await isPresent(sha) ? void 0 : sha))).filter(
+        (sha) => sha !== void 0
+      );
+      if (missing.length > 0) await git(dir, ["fetch", "--no-tags", "--quiet", "origin", ...missing]);
+    }
+  };
+}
 
 // src/main.ts
-var run2 = (0, import_node_util2.promisify)(import_node_child_process2.execFile);
 var env = process.env;
 var input = (name) => env[`INPUT_${name.toUpperCase()}`]?.trim() ?? "";
 function setOutput(name, value) {
   if (env.GITHUB_OUTPUT) (0, import_node_fs.appendFileSync)(env.GITHUB_OUTPUT, `${name}=${value}
 `);
-}
-async function fetchCommits(dir, shas, pull) {
-  const git2 = (args) => run2("git", args, { cwd: dir, maxBuffer: 64 * 1024 * 1024 });
-  await git2(["fetch", "--no-tags", "--quiet", "origin", `+refs/pull/${pull.number}/head:refs/remotes/change-contract/pr-${pull.number}`, `+refs/heads/${pull.baseRef}:refs/remotes/change-contract/base`]);
-  const missing = [];
-  for (const sha of shas) {
-    if (!await git2(["cat-file", "-e", `${sha}^{commit}`]).then(() => true, () => false)) missing.push(sha);
-  }
-  if (missing.length > 0) await git2(["fetch", "--no-tags", "--quiet", "origin", ...missing]);
 }
 async function main2() {
   const dir = env.GITHUB_WORKSPACE ?? process.cwd();
@@ -220267,14 +220311,10 @@ async function main2() {
   const outcome = await handleEvent(event, {
     repo: env.GITHUB_REPOSITORY ?? "",
     token: input("github-token"),
-    fetch: (url, init) => fetch(url, init),
+    fetch: (url, init2) => fetch(url, init2),
     apiUrl: env.GITHUB_API_URL,
     graphqlUrl: env.GITHUB_GRAPHQL_URL,
-    git: {
-      reader: createGitReader(dir),
-      readCommits: (base, head) => readCommits(dir, base, head),
-      fetchCommits: (shas, pull) => fetchCommits(dir, shas, pull)
-    }
+    git: createGitAccess(dir)
   });
   if (!outcome.handled) {
     console.log(outcome.reason);

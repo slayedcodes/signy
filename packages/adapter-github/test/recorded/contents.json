@@ -1,0 +1,8 @@
+{
+  "type": "file",
+  "encoding": "base64",
+  "name": "{{path}}",
+  "path": "{{path}}",
+  "content": {{content}},
+  "html_url": "https://github.com/acme/pilot/blob/main/{{path}}"
+}

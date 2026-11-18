@@ -54,12 +54,19 @@ importers:
 
   packages/cli:
     dependencies:
+      '@change-contract/adapter-github':
+        specifier: workspace:*
+        version: link:../adapter-github
       '@change-contract/core':
         specifier: workspace:*
         version: link:../core
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
+    devDependencies:
+      esbuild:
+        specifier: ^0.25.0
+        version: 0.25.12
 
   packages/core:
     dependencies:
